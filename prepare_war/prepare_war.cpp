@@ -44,6 +44,8 @@ int main() {
         city A;
         A.red_warrior = R.get_warrior();
         A.blue_warrior = B.get_warrior();
+        std::cout << "种类" << A.blue_warrior->get_kind() << std::endl;
+        std::cout << "种类" << A.red_warrior->get_kind() << std::endl;
         A.to_start_war();
 
         std::cout << std::endl << "**********第" << i << "轮测试结束**********" << std::endl;
