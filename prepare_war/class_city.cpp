@@ -4,11 +4,111 @@
 //	HP += 10;
 //};
 //  
+
+void city::enter_city(Warrior* w) {
+	if (w->belong_headquater == "RED") {
+		red_warrior = w;
+	}
+	if (w->belong_headquater == "BLUE") {
+		blue_warrior = w;
+	}
+	if (w->get_weapon() == "bomb") {
+		have_bomb = true;
+	}
+	if (w->get_weapon() == "arrow") {
+		have_arrow = true;
+	}
+}
+
+bool city::predict_bomb() {
+	if (blue_warrior->get_weapon() != "bomb" && red_warrior->get_weapon() != "bomb") {//没有炸弹
+		return false;//返回不使用
+	}
+	double hurt1,hurt2;
+	if (red_warrior->get_weapon() == "bomb" && who_to_start) {//红方拥有炸弹&&发起进攻
+		hurt1 = red_warrior->start_war();
+		if (blue_warrior->get_HP() <= hurt1) {//蓝方必死
+			return false;
+		}
+		else {
+			hurt2 = blue_warrior->fight_back();
+			if (red_warrior->get_HP() <= hurt2) {//红方受反击而死
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	if (red_warrior->get_weapon() == "bomb" && !who_to_start) {//红方拥有炸弹&&反击
+		hurt1 = blue_warrior->start_war();
+		if (red_warrior->get_HP() <= hurt1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	//红蓝交换
+	if (blue_warrior->get_weapon() == "bomb" && !who_to_start) {//blue方拥有炸弹&&发起进攻
+		hurt1 = blue_warrior->start_war();
+		if (red_warrior->get_HP() <= hurt1) {//red方必死
+			return false;
+		}
+		else {
+			hurt2 = red_warrior->fight_back();
+			if (blue_warrior->get_HP() <= hurt2) {//blue方受反击而死
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	if (blue_warrior->get_weapon() == "bomb" && who_to_start) {//blue方拥有炸弹&&反击
+		hurt1 = red_warrior->start_war();
+		if (blue_warrior->get_HP() <= hurt1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+}
+
+void city::use_bomb() {
+	if (red_warrior->get_weapon() == "bomb") {
+		std::cout << "RED" << " " << red_warrior->get_kind() << " " << red_warrior->get_id() << " " << "used a bomb and killed BLUE ";
+		std::cout << blue_warrior->get_kind() << " " << blue_warrior->get_id() << std::endl;
+	}
+	if (blue_warrior->get_weapon() == "bomb") {
+		std::cout << "BLUE" << " " << blue_warrior->get_kind() << " " << blue_warrior->get_id() << " " << "used a bomb and killed RED ";
+		std::cout << red_warrior->get_kind() << " " << red_warrior->get_id() << std::endl;
+	}
+	red_warrior->is_dead = true;
+	blue_warrior->is_dead = true;
+}
+
+void city::use_arrow() {
+	/*if (red_warrior->get_weapon() == "arrow") {
+
+	}*/
+}
+
+void city::who_start() {
+	if ((is_flag && flag == "RED") || (!is_flag && ID % 2 != 0)) {
+		who_to_start = true;
+	}
+	else {
+		who_to_start = false;
+	}
+}
+
 bool city::war() {
 	bool res = true;
 	double hurt1, hurt2;//两者产生的伤害
 	bool win1, win2;
-	if ((is_flag&&flag == "RED")||(!is_flag&&ID%2!=0)) {//红方发起进攻
+	if (who_to_start) {//红方发起进攻
 		hurt1 = red_warrior->start_war();//发起战争，hurt1是造成的伤害
 		red_warrior->use_weapon();//武器损耗
 		win1 = blue_warrior->get_hurt(hurt1);//蓝方受伤，并判断是否死亡
@@ -51,25 +151,6 @@ bool city::war() {
 		std::cout << "[PROCESS]平局" << std::endl;
 	}
 	return res;
-	////对dragon欢呼的判定
-	//if (red_warrior->get_kind() == "dragon"&&!red_warrior->is_dead) {
-	//	dragon* d = dynamic_cast<dragon*> (red_warrior);
-	//	if (red_warrior->is_winner) {
-	//		d->yell(1);
-	//	}
-	//	else {
-	//		d->yell(0);
-	//	}
-	//}
-	//if (blue_warrior->get_kind() == "dragon" && !blue_warrior->is_dead) {
-	//	dragon* d2 = dynamic_cast<dragon*> (blue_warrior);
-	//	if (blue_warrior->is_winner) {
-	//		d2->yell(1);
-	//	}
-	//	else {
-	//		d2->yell(0);
-	//	}
-	//}
 
 }
 
@@ -139,6 +220,13 @@ void city::judge_loyality() {
 void city::to_start_war() {
 	if (red_warrior == nullptr || blue_warrior == nullptr) {
 		return;
+	}
+	if (have_bomb) {
+		bool pred = predict_bomb();
+		if (pred) {
+			use_bomb();
+			return;
+		}
 	}
 	bool res = this->war();
 	if (res) {

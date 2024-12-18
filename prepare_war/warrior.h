@@ -9,12 +9,13 @@ class Warrior {
 private:
     int ID;
     std::string kind;
-    std::string belong_headquater;
+
 protected:
     weapon* my_weapon;
     double power;
 
 public:
+    std::string belong_headquater; //所属方
     int In_city;//所在的城市编号
     bool is_winner = false;//标记胜利的武士
     bool is_dead = false;//标记死亡的武士
@@ -26,6 +27,7 @@ public:
     std::string get_weapon();
     std::string get_kind();
     void add_HP(double a);
+    void step_on(int n);//前进
     weapon* lost_weapon();//掉落weapon（专门针对wolf）
     virtual bool use_weapon();//计算对武器的使用
     virtual double start_war();//主动攻击

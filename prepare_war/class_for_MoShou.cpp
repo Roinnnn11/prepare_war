@@ -79,6 +79,7 @@ int HeadQuarter::follow_order_to_create(int order) {
                 break;
             }
             else {
+                A->belong_headquater = this->name;
                 A->set_kind("dragon");
                 HP_sum -= A->get_HP();
                 dragon* d = dynamic_cast<dragon*>(A);
@@ -98,6 +99,7 @@ int HeadQuarter::follow_order_to_create(int order) {
                 break;
             }
             else {
+                A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
@@ -112,6 +114,7 @@ int HeadQuarter::follow_order_to_create(int order) {
                 break;
             }
             else {
+                A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
@@ -127,7 +130,7 @@ int HeadQuarter::follow_order_to_create(int order) {
                 break;
             }
             else {
-                
+                A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
                 lion* l = dynamic_cast<lion*>(A);
                 l->set_loyality(HP_sum);
@@ -144,6 +147,7 @@ int HeadQuarter::follow_order_to_create(int order) {
                 break;
             }
             else {
+                A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;

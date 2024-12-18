@@ -30,6 +30,16 @@ void Add_hp_to_warrior(Warrior* w, double hp) {
     return;
 }
 
+void Warrior::step_on(int n) {//假设红方从0到n，蓝方从n到0
+    if (belong_headquater == "RED"&&In_city<n) {
+        In_city++;//
+    }
+    else if(belong_headquater=="BLUE"&&In_city>0) {
+        In_city--;
+    }
+    return;
+}
+
 weapon* Warrior::lost_weapon() {
     return my_weapon;
 }
