@@ -31,6 +31,9 @@ public:
     int get_HPSUM();
 
     Warrior* get_warrior();
+
+    void reward();//战斗之后发放奖励（对赢了的）
+    void clear_dead();//清除死亡的武士
 };
 
 

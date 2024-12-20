@@ -3,7 +3,7 @@
 
 #include<iostream>
 #include<vector>
-#include"MoShou.h"
+#include"headquarter.h"
 #include"weapon.h"
 #include"warrior.h"
 #include"city.h"
@@ -41,7 +41,7 @@ int main() {
             res2 = B.get_is_stop_creating();
             t++;
         }
-        city A;
+        city A(1);
         A.red_warrior = R.get_warrior();
         A.blue_warrior = B.get_warrior();
         std::cout << "种类" << A.blue_warrior->get_kind() << std::endl;

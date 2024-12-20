@@ -17,19 +17,26 @@ protected:
 public:
     std::string belong_headquater; //所属方
     int In_city;//所在的城市编号
+    int destination;//目的地
     bool is_winner = false;//标记胜利的武士
     bool is_dead = false;//标记死亡的武士
+    bool arrive_destination = false;//标记是否到达目的地
     int my_hp;
     
+
     void set_id(int num);
     void set_kind(std::string k);
     int get_id(); 
     std::string get_weapon();
     std::string get_kind();
-    void add_HP(double a);
+    void print_name();//输出“基地 种类 id”
+    double get_power() {
+		return power;
+	}//输出武士的攻击力
+    void add_HP(double a);//加血
     void step_on(int n);//前进
     weapon* lost_weapon();//掉落weapon（专门针对wolf）
-    virtual bool use_weapon();//计算对武器的使用
+    
     virtual double start_war();//主动攻击
     virtual bool get_hurt(double hurt);//受伤，并判断是否死亡
     virtual double fight_back();//发起反击
@@ -110,8 +117,15 @@ public:
     void decrease_loyality();
 };
 
-class wolf : public Warrior {
+class wolf : public Warrior {//狼的特殊性在于捡起多种武器。所以提供三个“装备栏”
+    private:
+        sword* my_sword;
+        arrow* my_arrow;
+        bomb* my_bomb;
 public:
+    bool have_sword=false;
+    bool have_arrow=false;
+    bool have_bomb=false;
     wolf(int id);
     static int HP;
     int get_HP() const override {

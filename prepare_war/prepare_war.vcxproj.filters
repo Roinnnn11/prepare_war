@@ -18,7 +18,7 @@
     <ClCompile Include="prepare_war.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="class_for_MoShou.cpp">
+    <ClCompile Include="class_headquarter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="class_weapon.cpp">
@@ -32,7 +32,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MoShou.h">
+    <ClInclude Include="headquarter.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="warrior.h">

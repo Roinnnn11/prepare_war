@@ -1,6 +1,6 @@
 #include<iostream>
 #include<vector>
-#include"MoShou.h"
+#include"headquarter.h"
 
 HeadQuarter::HeadQuarter(int m, std::string new_name) {
     HP_sum = m;
@@ -202,4 +202,24 @@ int HeadQuarter::get_HPSUM() {
 
 Warrior* HeadQuarter::get_warrior() {
     return list_of_warriors.front();
-}
+};
+
+void HeadQuarter::reward() {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->is_winner == true) {
+            if (HP_sum >= 8) {
+                list_of_warriors[i]->add_HP(8);
+                HP_sum -= 8;
+            }
+        }
+	}
+};
+
+void HeadQuarter::clear_dead() {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->is_dead == true) {
+			list_of_warriors.erase(list_of_warriors.begin() + i);
+			i--;
+		}
+	}
+};  

@@ -45,8 +45,8 @@ public:
 };
 class arrow : public weapon {
 private:
-    int used_cnt;//使用次数
 public:
+    int used_cnt;//使用次数
     arrow() {
         power = 5;
         used_cnt = 0;

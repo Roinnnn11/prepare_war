@@ -1,9 +1,21 @@
 #include"city.h"
 #include"warrior.h"
-//void city::create_HP() {
-//	HP += 10;
-//};
-//  
+void city::create_HP() {
+	HP += 10;
+};
+
+city::city(int i) {
+	ID = i;
+	red_warrior = nullptr;
+	blue_warrior = nullptr;
+	have_bomb = false;
+	have_arrow = false;
+	who_to_start = false;
+	red_win = false;
+	blue_win = false;
+}
+	
+
 
 void city::enter_city(Warrior* w) {
 	if (w->belong_headquater == "RED") {
@@ -12,6 +24,18 @@ void city::enter_city(Warrior* w) {
 	if (w->belong_headquater == "BLUE") {
 		blue_warrior = w;
 	}
+
+	if (w->get_kind() == "wolf") {//如果是狼，对其特判，具有什么武器
+		wolf* wf = dynamic_cast<wolf*>(w);;
+		if (wf->have_bomb) {
+			have_bomb = true;
+		}
+		if (wf->have_arrow) {
+			have_arrow = true;
+		}
+		return;
+	}
+
 	if (w->get_weapon() == "bomb") {
 		have_bomb = true;
 	}
@@ -90,9 +114,9 @@ void city::use_bomb() {
 }
 
 void city::use_arrow() {
-	/*if (red_warrior->get_weapon() == "arrow") {
+	if (red_warrior->get_weapon() == "arrow"&&(red_warrior->destination-red_warrior->In_city)>1) {
 
-	}*/
+	}
 }
 
 void city::who_start() {
@@ -110,18 +134,37 @@ bool city::war() {
 	bool win1, win2;
 	if (who_to_start) {//红方发起进攻
 		hurt1 = red_warrior->start_war();//发起战争，hurt1是造成的伤害
-		red_warrior->use_weapon();//武器损耗
+		//输出发起战争的信息
+		red_warrior->print_name();
+		std::cout << "attacked ";
+		blue_warrior->print_name();
+		std::cout << "in city " << ID << " with " << red_warrior->get_HP() << " elements and force " << red_warrior->get_power() << std::endl;
+		//
 		win1 = blue_warrior->get_hurt(hurt1);//蓝方受伤，并判断是否死亡
 		if (win1) {
 			std::cout << "[PROCESS]红方胜利" << std::endl;
+			//输出死亡信息
+			blue_warrior->print_name();
+			std::cout<< "was killed in city " << ID << std::endl;
+			//
 			red_warrior->is_winner = true;//标记红方胜利，蓝方死亡
 			blue_warrior->is_dead = true;
 		}
 		else {
+			//输出反击信息
+			blue_warrior->print_name();
+			std::cout << "fought back against ";
+			red_warrior->print_name();
+			std::cout << "In city " << ID << std::endl;
+			//
 			hurt2 = blue_warrior->fight_back();//蓝方发起反击
 			win2 = red_warrior->get_hurt(hurt2);//红方受伤，并判断是否死亡
 			if (win2) {
 				std::cout << "[PROCESS]Blue方胜利" << std::endl;
+				//输出死亡信息
+				red_warrior->print_name();
+				std::cout << "was killed in city " << ID << std::endl;
+				//
 				blue_warrior->is_winner = true;
 				red_warrior->is_dead = true;
 			}
@@ -130,17 +173,37 @@ bool city::war() {
 	}
 	else {//蓝方先发起进攻
 		hurt1 = blue_warrior->start_war();
+		//输出发起战争的信息
+		blue_warrior->print_name();
+		std::cout << "attacked ";
+		red_warrior->print_name();
+		std::cout << "in city " << ID << " with " << blue_warrior->get_HP() << " elements and force " << blue_warrior->get_power() << std::endl;
+		//
 		win1 = red_warrior->get_hurt(hurt1);
 		if (win1) {
 			std::cout << "[PROCESS]blue方胜利" << std::endl;
+			//输出死亡信息
+			red_warrior->print_name();
+			std::cout << "was killed in city " << ID << std::endl;
+			//
 			blue_warrior->is_winner = true;
 			red_warrior->is_dead = true;
 		}
 		else {
 			hurt2 = red_warrior->fight_back();
+			//输出反击信息
+			red_warrior->print_name();
+			std::cout << "fought back against ";
+			blue_warrior->print_name();
+			std::cout << "In city " << ID << std::endl;
+			//
 			win2 = blue_warrior->get_hurt(hurt2);
 			if (win2) {
 				std::cout << "[PROCESS]红方胜利" << std::endl;
+				//输出死亡信息
+				blue_warrior->print_name();
+				std::cout << "was killed in city " << ID << std::endl;
+				//
 				red_warrior->is_winner = true;//标记红方胜利，蓝方死亡
 				blue_warrior->is_dead = true;
 			}
@@ -217,6 +280,29 @@ void city::judge_loyality() {
 	return;
 }
 
+void city::to_flag() {
+	if (red_win ) {
+		if (red_warrior->is_winner) {
+			is_flag = true;
+			flag = "RED";
+			std::cout<<"RED flag raised in city "<<ID<<std::endl;
+		}
+		else {
+			red_win = false;
+		}
+	}
+	else if (blue_win) {
+		if(blue_warrior->is_winner){
+			is_flag = true;
+			flag = "BLUE";
+			std::cout << "BLUE flag raised in city " << ID << std::endl;
+		}
+		else {
+			blue_win = false;
+		}
+	}
+}
+
 void city::to_start_war() {
 	if (red_warrior == nullptr || blue_warrior == nullptr) {
 		return;
@@ -233,9 +319,23 @@ void city::to_start_war() {
 		judge_yell();
 		judge_transfer();
 		judge_pick();
+		to_flag();
 	}
 	else {
 		judge_loyality();
 		return;
+	}
+}
+
+
+int city::took_HP() {
+	int res = HP;
+	HP = 0;
+	return res;
+}
+
+cities::cities(int n) {
+	for (int i = 1; i <= n; i++) {
+		city_list.push_back(city(i));
 	}
 }

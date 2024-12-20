@@ -20,6 +20,10 @@ int Warrior::get_id() {
     return ID;
 }
 
+void Warrior::print_name() {
+    std::cout << belong_headquater << " " << get_kind() << " " << get_id()<<" ";
+}
+
 void Warrior::add_HP(double a) {
     my_hp += a;
     return;
@@ -30,13 +34,36 @@ void Add_hp_to_warrior(Warrior* w, double hp) {
     return;
 }
 
-void Warrior::step_on(int n) {//假设红方从0到n，蓝方从n到0
-    if (belong_headquater == "RED"&&In_city<n) {
+void Warrior::step_on(int n) {//0为红方基地，n+1为蓝方基地，1-n为城市
+    //对雪人进行特殊处理
+    if (get_kind() == "iceman") {
+        iceman* i = dynamic_cast<iceman*> (this);
+        i->step++;
+        i->decrease_life();
+    }
+    if (belong_headquater == "RED"&&In_city<destination) {
         In_city++;//
     }
-    else if(belong_headquater=="BLUE"&&In_city>0) {
+    else if (belong_headquater == "RED" && In_city == destination) {
+        In_city++;
+        print_name();
+        arrive_destination = true;
+        std::cout<<"reached BLUE headquarter with "<<my_hp<<" elements and force "<<power<<std::endl;
+        return;
+    }
+    if(belong_headquater=="BLUE"&&In_city>1) {
         In_city--;
     }
+    else if (belong_headquater == "BLUE" && In_city == 1) {
+		In_city--;
+		print_name();
+        arrive_destination = true;
+		std::cout << "reached RED headquarter with " << my_hp << " elements and force " << power << std::endl;
+        return;
+	}
+    
+    print_name();
+    std::cout << "marched to city " << In_city << my_hp << " elements and force " << power << std::endl;
     return;
 }
 
@@ -45,6 +72,7 @@ weapon* Warrior::lost_weapon() {
 }
 
 double Warrior::start_war() {//进行主动攻击，返回值为造成的伤害
+    
     double hurt = power;
     bool is_lost=false;
     if (my_weapon == nullptr) {
@@ -64,31 +92,7 @@ double Warrior::start_war() {//进行主动攻击，返回值为造成的伤害
     return hurt;
 }
 
-bool Warrior::use_weapon() {
-    if (my_weapon == nullptr) {
-        return true;
-    }
-   /* bool is_lost;
-    if (my_weapon->kind == "sword") {
-        sword* s = dynamic_cast<sword*>(my_weapon);
-        is_lost = s->lost_weapon();
-    }
-    else if (my_weapon->kind == "bomb") {
-        bomb* b = dynamic_cast<bomb*>(my_weapon);
-        is_lost = b->lost_weapon();
-    }
-    else if (my_weapon->kind == "arrow") {
-        arrow* a = dynamic_cast<arrow*>(my_weapon);
-        is_lost = a->lost_weapon();
-    }
-    is_lost = is_lost_weapon(&my_weapon);
-    if (is_lost) {
 
-        std::cout << "失去了武器" << std::endl;
-        delete my_weapon;
-        my_weapon = nullptr;
-    }*/
-}
 
 bool Warrior::get_hurt(double hurt) {
 
@@ -229,9 +233,62 @@ wolf::wolf(int id) {
     power = 20;
     set_id(id);
     set_kind("wolf");
+    my_sword = nullptr;
+    my_arrow = nullptr;
+    my_bomb = nullptr;
 }
 
 void wolf::pick_weapon(weapon* w) {
-    this->my_weapon = w;
-    return;
-}
+    std::string kind = w->kind;
+    if (kind == "bomb"){
+        if (!have_bomb) {
+            bomb* b = dynamic_cast<bomb*>(w);
+            my_bomb = b;
+            have_bomb = true;
+            return;
+        }
+        else {
+            return;
+        }
+    }//bomb
+    if (kind == "arrow") {
+        if (!have_arrow) {
+            arrow* a = dynamic_cast<arrow*>(w);
+            my_arrow = a;
+            have_arrow = true;
+            return;
+        }
+        else {
+            arrow* a2 = dynamic_cast<arrow*>(w);
+            if (my_arrow->used_cnt <= a2->used_cnt) {
+                delete w;
+                return;
+            }
+            else {
+                delete my_arrow;
+                my_arrow = a2;
+                return;
+            }
+        }//else
+    }//arrow
+        if (kind == "sword") {
+            if (!have_sword) {
+                sword* s = dynamic_cast<sword*>(w);
+                my_sword = s;
+                have_sword = true;
+                return;
+            }
+            else {
+                sword* s2 = dynamic_cast<sword*>(w);
+                if (my_sword->power >= s2->power) {
+                    delete w;
+                    return;
+                }
+                else {
+                    delete my_sword;
+                    my_sword = s2;
+                    return;
+                }
+            }//else
+        }//sword
+    }
