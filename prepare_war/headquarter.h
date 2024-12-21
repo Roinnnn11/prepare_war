@@ -29,11 +29,17 @@ public:
     bool get_is_stop_creating();
 
     int get_HPSUM();
-
+    std::vector<Warrior*> get_list_of_warriors();
     Warrior* get_warrior();
-
+    void add_HP(int hp);
+    //按照时间点的一系列操作
+    void lion_run(int t,int min);//狮子逃跑
+    void march(int t,int min);//武士前进
+    
     void reward();//战斗之后发放奖励（对赢了的）
     void clear_dead();//清除死亡的武士
+    void report_hp();//汇报生命元
+    void report_warrior();//让武士汇报武器情况
 };
 
 

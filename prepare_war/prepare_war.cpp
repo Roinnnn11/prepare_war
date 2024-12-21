@@ -17,7 +17,7 @@ int main() {
     std::string b = "BLUE";
     int cnt;
     std::cin >> cnt;
-    int M;
+    int M,N,R,K,T;
     for (int i = 0; i < cnt; i++) {
         std::cin >> M;
         HeadQuarter R(M, r);

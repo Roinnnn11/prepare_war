@@ -132,6 +132,7 @@
     <ClCompile Include="class_warrior.cpp" />
     <ClCompile Include="class_weapon.cpp" />
     <ClCompile Include="prepare_war.cpp" />
+    <ClCompile Include="Round_time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="city.h" />

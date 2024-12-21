@@ -11,6 +11,11 @@ HeadQuarter:: ~HeadQuarter() {
     HeadQuarter::list_of_warriors.clear();
 };
 
+void HeadQuarter::add_HP(int hp) {
+	HP_sum += hp;
+	return;
+};
+  
 void HeadQuarter::show_kind_of_warrior(int order) {
     if (order == 0)    std::cout << "dragon";
     if (order == 1)    std::cout << "ninja";
@@ -204,6 +209,36 @@ Warrior* HeadQuarter::get_warrior() {
     return list_of_warriors.front();
 };
 
+std::vector<Warrior*> HeadQuarter::get_list_of_warriors() {
+	return list_of_warriors;
+};
+
+void HeadQuarter::lion_run(int t,int min) {//t代表时间
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->get_kind() == "lion") {
+            lion* l = dynamic_cast<lion*>(list_of_warriors[i]);
+            if (l->to_run) {
+                std::cout << t << ":"<<min <<" ";
+                l->print_name();
+                std::cout<<" ran away"<<std::endl;
+                list_of_warriors.erase(list_of_warriors.begin() + i);
+            }
+        }
+    }
+};
+
+void HeadQuarter::march(int t,int min) {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->arrive_destination == false) {
+            std::cout<<t<<":"<<min<<" ";
+            list_of_warriors[i]->step_on();
+        }
+    }
+
+}
+
+
+
 void HeadQuarter::reward() {
     for (int i = 0; i < list_of_warriors.size(); i++) {
         if (list_of_warriors[i]->is_winner == true) {
@@ -222,4 +257,15 @@ void HeadQuarter::clear_dead() {
 			i--;
 		}
 	}
-};  
+};   
+
+void HeadQuarter::report_hp() {
+	std::cout << HP_sum << " elements in " << name << " headquarter" << std::endl;
+	return;
+};
+
+void HeadQuarter::report_warrior() {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+		list_of_warriors[i]->report_weapon(); 
+	}
+};

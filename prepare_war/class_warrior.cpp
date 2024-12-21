@@ -34,7 +34,7 @@ void Add_hp_to_warrior(Warrior* w, double hp) {
     return;
 }
 
-void Warrior::step_on(int n) {//0为红方基地，n+1为蓝方基地，1-n为城市
+void Warrior::step_on( ) {//0为红方基地，n+1为蓝方基地，1-n为城市
     //对雪人进行特殊处理
     if (get_kind() == "iceman") {
         iceman* i = dynamic_cast<iceman*> (this);
@@ -71,6 +71,16 @@ weapon* Warrior::lost_weapon() {
     return my_weapon;
 }
 
+void Warrior::use_arrow() {
+    bool is_lost = false;
+    is_lost = this->my_weapon->lost_weapon();
+    if (is_lost) {
+        delete my_weapon;
+        my_weapon = nullptr;
+    }
+    return;
+}
+
 double Warrior::start_war() {//进行主动攻击，返回值为造成的伤害
     
     double hurt = power;
@@ -102,6 +112,7 @@ bool Warrior::get_hurt(double hurt) {
             l->life_to_transfer = l->my_hp;
         }
         std::cout << "[PROCESS]该武士死亡" << std::endl;
+        this->is_dead = true;
         this->my_hp = 0;
         return true;
     }
@@ -121,6 +132,21 @@ double Warrior::fight_back() {//进行反击
     return hurt;
 }
 
+void Warrior::report_weapon() {
+    print_name();
+    std::cout << "has ";
+    if (my_weapon != nullptr) {
+        std::cout << my_weapon->kind << "(" << my_weapon->power << ") " << std::endl;
+	}
+    else {
+        std::cout << "no weapon";
+    }
+    std::cout << std::endl;
+    return;
+
+}
+
+
 void dragon::set_weapon_forme() {
     int id = get_id();
     //std::cout << "[DEBUG]ID:" << id << std::endl;
@@ -131,7 +157,7 @@ void dragon::set_weapon_forme() {
 
 dragon::dragon(int id) {
     my_hp = HP;
-    power = 1;
+    power = d_power;
     set_id(id);
     set_weapon_forme(); 
     this->set_kind("dragon");
@@ -161,21 +187,58 @@ void ninja::set_weapon() {
     int id = get_id();
     int choice1 = id % 3;
     int choice2 = (id + 1) % 3;
-    my_weapon = create_weapon(choice1,power);
-    my_weapon2 = create_weapon(choice2,power);
+    my_weapon = create_weapon(choice1, power);
+    my_weapon2 = create_weapon(choice2, power);
 
-}
+};
 ninja::ninja(int id) {
     my_hp = HP;
-    power = 20;
+    power = n_power;
     set_id(id);
     set_weapon();
     this->set_kind("ninja");
     //std::cout << "[DEBUG]NINJA_W1:" << this->my_weapon.kind << std::endl;
     //std::cout << "[DEBUG]NINJA_W1:" << this->my_weapon2.kind << std::endl;
+};
+
+void ninja::use_arrow() {
+    	bool is_lost = false;
+        if (my_weapon->kind == "arrow") {
+		is_lost = my_weapon->lost_weapon();
+        if (is_lost) {
+			delete my_weapon;
+			my_weapon = nullptr;
+		}
+	}
+        else {
+		is_lost = my_weapon2->lost_weapon();
+        if (is_lost) {
+			delete my_weapon2;
+			my_weapon2 = nullptr;
+		}
+	}
+	return;
+
 }
 
-
+void ninja::report_weapon() {
+    bool have_weapon = false;
+    print_name();
+    std::cout << "has ";
+    if (my_weapon) {
+        std::cout<<my_weapon->kind<<"("<<my_weapon->power<<") ";
+        have_weapon = true;
+    }
+    if (my_weapon2) {
+		std::cout << my_weapon2->kind << "(" << my_weapon2->power << ") ";
+		have_weapon = true;
+	}
+    if (!have_weapon) {
+		std::cout << "no weapon";
+	}
+    std::cout << std::endl;
+	return;
+}
 
 void iceman::set_weapon() {
     int id = get_id();
@@ -186,7 +249,7 @@ void iceman::set_weapon() {
 
 iceman::iceman(int id) {
     my_hp = HP;
-    power = 20;
+    power = i_power;
     set_id(id);
     set_weapon();
     this->set_kind("iceman");
@@ -223,19 +286,36 @@ void lion::decrease_loyality() {
 
 lion::lion(int id) {
     my_hp = HP;
-    power = 20;
+    power = l_power;
     set_id(id);
     set_kind("lion");
 }
 
 wolf::wolf(int id) {
     my_hp = HP;
-    power = 20;
+    power = w_power;
     set_id(id);
     set_kind("wolf");
     my_sword = nullptr;
     my_arrow = nullptr;
     my_bomb = nullptr;
+}
+
+void wolf::use_arrow() {
+    bool is_lost = false;
+    is_lost = my_arrow->lost_weapon();
+    if (is_lost) {
+        delete my_arrow;
+        my_arrow = nullptr;
+    }
+    return;
+}
+
+void wolf::report_weapon() {
+    bool have_weapon = false;
+    if (have_arrow) {
+        std::cout<< "arrow(" << 3-my_arrow->used_cnt << ") ";
+    }
 }
 
 void wolf::pick_weapon(weapon* w) {

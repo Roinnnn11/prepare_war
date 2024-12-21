@@ -34,12 +34,16 @@ public:
 		return power;
 	}//输出武士的攻击力
     void add_HP(double a);//加血
-    void step_on(int n);//前进
+    void step_on();//前进
     weapon* lost_weapon();//掉落weapon（专门针对wolf）
     
+    virtual void use_arrow();//使用arrow
     virtual double start_war();//主动攻击
     virtual bool get_hurt(double hurt);//受伤，并判断是否死亡
     virtual double fight_back();//发起反击
+
+    virtual void report_weapon();//汇报武器情况
+
     virtual int get_HP() const = 0;
     virtual  void print_info() const= 0;
 };
@@ -50,7 +54,8 @@ class dragon : public Warrior {
 private:
     float morale;//士气
 public:
-    
+    static int HP;
+    static int d_power;
     dragon(int id);
     void set_morale(int res_life);//传入参数:剩余生命元
     void set_weapon_forme();//为其创建武器
@@ -58,7 +63,7 @@ public:
         return HP;
     };
     int get_morale();
-    static int HP;
+    
     void print_info()const override {
         std::cout << "It has a " << this->my_weapon->kind << ",and it's morale is " << this->morale << std::endl;
     };
@@ -72,10 +77,14 @@ private:
 public:
     ninja(int id);
     static int HP;
+    static int n_power;
+
     void set_weapon();
     int get_HP() const override {
         return HP;
     };
+    void use_arrow() override;
+    void report_weapon() override;
     void print_info()const override {
         std::cout << "It has a " << this->my_weapon->kind << " and a " << this->my_weapon2->kind << std::endl;
     };
@@ -85,9 +94,11 @@ class iceman : public Warrior {
 private:
 public:
     int step;//记录雪人前进步数
+    static int HP;
+    static int i_power;
     iceman(int id);
     void set_weapon();
-    static int HP;
+    
     int get_HP() const override {
         return HP;
     };
@@ -104,6 +115,8 @@ public:
     bool to_run = false;//一旦为true，则触发逃跑
     double K;//忠诚度下降的值
     static int HP;
+    static int l_power;//这一种类的攻击力
+
     double life_to_transfer;//战败后保存的生命
 
     lion(int id);
@@ -118,22 +131,26 @@ public:
 };
 
 class wolf : public Warrior {//狼的特殊性在于捡起多种武器。所以提供三个“装备栏”
-    private:
-        sword* my_sword;
-        arrow* my_arrow;
-        bomb* my_bomb;
+           
 public:
     bool have_sword=false;
     bool have_arrow=false;
     bool have_bomb=false;
-    wolf(int id);
     static int HP;
+    static int w_power;
+    sword* my_sword;
+    arrow* my_arrow;
+    bomb* my_bomb;
+    wolf(int id);
+    
     int get_HP() const override {
         return HP;
     };
     void print_info()const override {
 
     };
+    void use_arrow() override;
+    void report_weapon() override;
     void pick_weapon(weapon* w);//捡起武器
 };
 

@@ -8,6 +8,7 @@ public:
     double power;
     std::string kind;
     void operator=(const weapon& w);
+    virtual void print_info()=0;
     virtual bool lost_weapon() {//如果为true，则视为武士不再拥有武器
         return true;
     };
@@ -31,7 +32,9 @@ public:
         }
         return false;
     }
-
+    void print_info() {
+		std::cout << "sword(" << power << ")";
+    }
 };
 class bomb : public weapon {
 private:
@@ -41,7 +44,9 @@ public:
         power = 20;
         kind.assign("bomb");
     }
-   
+    void print_info() {
+        std::cout << "bomb";
+   }
 };
 class arrow : public weapon {
 private:
@@ -61,6 +66,11 @@ public:
         }
         return false;
     };
+
+    void print_info() {
+		std::cout << "arrow(" << 3 - used_cnt << ")";
+	}
+    
 };
 weapon* create_weapon(int choice, int p);
 bool is_lost_weapon(weapon* w);

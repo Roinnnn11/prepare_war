@@ -100,17 +100,23 @@ bool city::predict_bomb() {
 	}
 }
 
-void city::use_bomb() {
+void city::use_bomb(int t,int min) {
+	std::cout << t << ":" << min << " ";
 	if (red_warrior->get_weapon() == "bomb") {
-		std::cout << "RED" << " " << red_warrior->get_kind() << " " << red_warrior->get_id() << " " << "used a bomb and killed BLUE ";
-		std::cout << blue_warrior->get_kind() << " " << blue_warrior->get_id() << std::endl;
+		red_warrior->print_name();
+		std::cout <<  "used a bomb and killed ";
+		blue_warrior->print_name();	
 	}
 	if (blue_warrior->get_weapon() == "bomb") {
-		std::cout << "BLUE" << " " << blue_warrior->get_kind() << " " << blue_warrior->get_id() << " " << "used a bomb and killed RED ";
-		std::cout << red_warrior->get_kind() << " " << red_warrior->get_id() << std::endl;
+		blue_warrior->print_name();
+		std::cout << "used a bomb and killed ";
+		red_warrior->print_name();
 	}
+	std::cout << std::endl;
 	red_warrior->is_dead = true;
 	blue_warrior->is_dead = true;
+	red_warrior = nullptr;
+	blue_warrior = nullptr;
 }
 
 void city::use_arrow() {
@@ -334,8 +340,131 @@ int city::took_HP() {
 	return res;
 }
 
-cities::cities(int n) {
-	for (int i = 1; i <= n; i++) {
-		city_list.push_back(city(i));
+cities::cities() {
+	for (int i = 1; i <= N; i++) {
+		city c(i);
+		city_list.push_back(&c);
+	}
+}
+
+void cities::cities_create_hp() {
+	for (int i = 1; i < city_list.size(); i++) {
+		city_list[i]->create_HP();
+	}
+}
+
+void cities::warrior_enter_city(HeadQuarter* red, HeadQuarter* blue) {
+	std::vector<Warrior*> red_list = red->get_list_of_warriors();
+	std::vector<Warrior*> blue_list = blue->get_list_of_warriors();
+	for (int i = 0; i < red_list.size(); i++) {
+		Warrior* w = red_list[i];
+		if(!w->arrive_destination)
+		city_list[w->In_city]->enter_city(w);//“进入城市”
+	}
+	for (int i = 0; i < blue_list.size(); i++) {
+		Warrior* w2 = blue_list[i];
+		if(!w2->arrive_destination)
+		city_list[w2->In_city]->enter_city(w2);
+	}
+	return;
+}
+
+void cities::use_arrow() {
+	for (int i = 1; i < city_list.size(); i++) {
+		city *c = city_list[i];
+		if (city_list[i]->have_arrow) {//找到有arrow的城市，再根据下一个城市是否有敌人，判断是否使用
+			if (c->red_warrior->get_weapon() == "arrow") {
+				if (i < city_list.size() - 2) {
+					city* c1 = city_list[i + 1];
+					if (c1->blue_warrior) {
+						c->red_warrior->use_arrow();
+						c1->blue_warrior->get_hurt(R);
+						if (c1->blue_warrior->is_dead) {//如果射杀，输出信息
+							c->red_warrior->print_name();
+							std::cout << "shot and killed ";
+							c1->blue_warrior->print_name();
+							
+							c1->blue_warrior = nullptr;
+						}
+						else {//输出相应信息
+							c->red_warrior->print_name();
+							std::cout<< "shot ";
+							
+						}
+						std::cout << std::endl;
+					}//c1->blue_warrior
+				}//i<s
+			}//red_arrow
+			if (c->blue_warrior->get_weapon() == "arrow") {//同理
+				if (i > 1) {
+					city* c2 = city_list[i - 1];
+					if (c2->red_warrior) {
+						c->blue_warrior->use_arrow();
+						c2->red_warrior->get_hurt(R);
+						if (c2->red_warrior->is_dead) {
+							c->blue_warrior->print_name();
+							std::cout << "shot and killed ";
+							c2->red_warrior->print_name();
+							
+							c2->red_warrior = nullptr;
+						}//is_dead
+						else {
+							c->blue_warrior->print_name();
+							std::cout << "shot";
+						}
+						std::cout << std::endl;
+					}//c2.red_warrior
+				}//i>
+			}//blue_arrow
+		}//have_arrow
+	}
+}
+
+void cities::OneWarrior_took_hp(HeadQuarter* red, HeadQuarter* blue) {
+	for (int i = 1; i < city_list.size(); i++) {
+		city *c = city_list[i];
+		if (c->red_warrior && c->blue_warrior) {
+			continue;
+		}
+		if (!c->red_warrior && !c->blue_warrior) {
+			continue;
+		}
+		int gain_hp;
+		if (c->red_warrior && !c->blue_warrior) {
+			 gain_hp = c->took_HP();
+			c->red_warrior->print_name();
+			std::cout<<"earned "<<gain_hp<<" elements for his headquarter"<<std::endl;
+			red->add_HP(gain_hp);
+		}
+		if (!c->red_warrior && c->blue_warrior) {
+			gain_hp = c->took_HP();
+			c->blue_warrior->print_name();
+			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
+			blue->add_HP(gain_hp);
+		}
+		 
+	}
+	return;
+}
+
+void cities::AfterWar_took_hp(HeadQuarter* red, HeadQuarter* blue) {
+	for (int i = 1; i < city_list.size(); i++) {
+		city* c = city_list[i];
+		int gain_hp;
+		if (c->red_warrior->is_winner) {
+			gain_hp = c->took_HP();
+			c->red_warrior->print_name();
+			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
+			red->add_HP(gain_hp);
+		}
+		else if (c->blue_warrior->is_winner) {
+			gain_hp = c->took_HP();
+			c->blue_warrior->print_name();
+			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
+			blue->add_HP(gain_hp);
+		}
+		else {
+			continue;
+		}
 	}
 }
