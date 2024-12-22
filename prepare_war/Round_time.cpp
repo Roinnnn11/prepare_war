@@ -1,39 +1,56 @@
-#include "headquarter.h"
-#include"warrior.h"
-#include"weapon.h"
-#include"city.h"
-//t´ú±íÕûµã
-void Round(HeadQuarter *red,HeadQuarter *blue,cities *c,int t) {
+ï»¿#include"OneRound.h"
+//tä»£è¡¨æ•´ç‚¹
+int Round(HeadQuarter *red,HeadQuarter *blue,cities *c,int t) {
 	int min = 0;
-	//0·Ö£¬´´ÔìÎäÊ¿*******************²»ÍêÉÆ******************
-	red->create_warrior(t);
-	blue->create_warrior(t);
-	//5·Ö£¬Ê¨×ÓÌÓÅÜ
+	//0åˆ†ï¼Œåˆ›é€ æ­¦å£«*******************ä¸å®Œå–„******************
+	//red->create_warrior(t);
+	//blue->create_warrior(t);
+	//5åˆ†ï¼Œç‹®å­é€ƒè·‘
 	min = 5;
 	red->lion_run(t,min);
 	blue->lion_run(t,min);
-	//10·Ö£¬ÎäÊ¿Ç°½ø
+	//10åˆ†ï¼Œæ­¦å£«å‰è¿›
 	min = 10;
 	red->march(t,min);
 	blue->march(t,min);
-	c->warrior_enter_city(red, blue);//¶Ô³ÇÊĞ¶øÑÔ£¬Ê¹Æä¶ÔÎäÊ¿Ö¸Õë£¬Ö¸Ïò½øÈëµÄÎäÊ¿
-	//20·Ö£¬Éú³ÉHP
-	c->cities_create_hp();
-	//30·Ö£¬Ö»ÓĞÒ»¸öÎäÊ¿µÄ³ÇÊĞÊ§È¥ÉúÃüÔª
-	min = 30;
-	c->OneWarrior_took_hp(red, blue);
-	//35·Ö£¬·Å¼ı
-	min = 35;
-	c->use_arrow();//´Ó³ÇÊĞÈº¶Ô·Å¼ı·ÖÎö.¶Ô³ÇÊĞÉ¾³ıÁËÎäÊ¿Ö¸Õë£¨Ö¸Ïònullptr£©
-	//red->clear_dead();//ÇåÀíËÀÍöÎäÊ¿
-	//blue->clear_dead();
-	//38·Ö£¬ÆÀ¹ÀÕ¨µ¯µÄÊ¹ÓÃ
-	for (int i = 1; i < c->city_list.size(); i++) {
-		if (c->city_list[i]->predict_bomb()) {//Ô¤²âÕ¨µ¯Ê¹ÓÃ************²»ÍêÉÆ********************
-			c->city_list[i]->use_bomb(t,min);
-		}
+	if (red->TakeDown >= 2) {
+		return -1;
 	}
-	//40·Ö£¬Õ½Õù
+	if (blue->TakeDown >= 2) {
+		return 1;
+	}
+	c->warrior_enter_city(red, blue);//å¯¹åŸå¸‚è€Œè¨€ï¼Œä½¿å…¶å¯¹æ­¦å£«æŒ‡é’ˆï¼ŒæŒ‡å‘è¿›å…¥çš„æ­¦å£«
+	//20åˆ†ï¼Œç”ŸæˆHP
+	c->cities_create_hp();
+	//30åˆ†ï¼Œåªæœ‰ä¸€ä¸ªæ­¦å£«çš„åŸå¸‚å¤±å»ç”Ÿå‘½å…ƒ
+	min = 30;
+	c->OneWarrior_took_hp(red, blue,t,min);
+	//35åˆ†ï¼Œæ”¾ç®­
+	min = 35;
+	c->use_arrow();//ä»åŸå¸‚ç¾¤å¯¹æ”¾ç®­åˆ†æ.å¯¹åŸå¸‚åˆ é™¤äº†æ­¦å£«æŒ‡é’ˆï¼ˆæŒ‡å‘nullptrï¼‰
+	//red->clear_dead();//æ¸…ç†æ­»äº¡æ­¦å£«
+	//blue->clear_dead();
+	//38åˆ†ï¼Œè¯„ä¼°ç‚¸å¼¹çš„ä½¿ç”¨
+	min = 38;
+	c->use_bomb(t,min);
+	//40åˆ†ï¼Œæˆ˜äº‰
 	min = 40;
-
+	c->all_war(t, min);//åŒ…å«è¿›æ”»/åå‡»/æˆ˜æ­»/æ¬¢å‘¼/å‡æ——
+	red->clear_dead();//æ¸…ç†æ­»äº¡æ­¦å£«ï¼Œå¹¶å¯¹èƒœè€…å¥–åŠ±
+	blue->clear_dead();
+	red->reward();
+	blue->reward();
+	c->AfterWar_took_hp(red, blue,t,min);//æŒ‡æŒ¥éƒ¨æ”¶å–ç”Ÿå‘½å…ƒ
+	c->warrior_leave_city();//æ­¦å£«ç¦»å¼€åŸå¸‚
+	//50åˆ†ï¼Œå¸ä»¤éƒ¨æŠ¥å‘Šç”Ÿå‘½å…ƒæ•°é‡
+	min = 50;
+	std::cout << t << ":" << min << " ";
+	red->report_hp();
+	std::cout << t << ":" << min << " ";
+	blue->report_hp();
+	//55åˆ†ï¼Œæ­¦å£«æŠ¥å‘Šæ­¦å™¨æƒ…å†µ
+	min = 55;
+	red->report_warrior(t, min);
+	blue->report_warrior(t, min);
+	return 0;
 }

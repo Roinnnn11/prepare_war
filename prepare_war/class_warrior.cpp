@@ -1,4 +1,4 @@
-#include"warrior.h"
+ï»¿#include"warrior.h"
 
 void Warrior::set_id(int num) {
     ID = num;
@@ -9,6 +9,9 @@ void Warrior::set_kind(std::string k) {
 }
 
 std::string Warrior::get_weapon() {
+    if (my_weapon == nullptr) {
+        return "no weapon";
+    }
     return my_weapon->kind;
 }
 
@@ -34,8 +37,8 @@ void Add_hp_to_warrior(Warrior* w, double hp) {
     return;
 }
 
-void Warrior::step_on( ) {//0Îªºì·½»ùµØ£¬n+1ÎªÀ¶·½»ùµØ£¬1-nÎª³ÇÊĞ
-    //¶ÔÑ©ÈË½øĞĞÌØÊâ´¦Àí
+bool Warrior::step_on( ) {//0ä¸ºçº¢æ–¹åŸºåœ°ï¼Œn+1ä¸ºè“æ–¹åŸºåœ°ï¼Œ1-nä¸ºåŸå¸‚
+    //å¯¹é›ªäººè¿›è¡Œç‰¹æ®Šå¤„ç†
     if (get_kind() == "iceman") {
         iceman* i = dynamic_cast<iceman*> (this);
         i->step++;
@@ -49,7 +52,7 @@ void Warrior::step_on( ) {//0Îªºì·½»ùµØ£¬n+1ÎªÀ¶·½»ùµØ£¬1-nÎª³ÇÊĞ
         print_name();
         arrive_destination = true;
         std::cout<<"reached BLUE headquarter with "<<my_hp<<" elements and force "<<power<<std::endl;
-        return;
+        return true;
     }
     if(belong_headquater=="BLUE"&&In_city>1) {
         In_city--;
@@ -59,12 +62,12 @@ void Warrior::step_on( ) {//0Îªºì·½»ùµØ£¬n+1ÎªÀ¶·½»ùµØ£¬1-nÎª³ÇÊĞ
 		print_name();
         arrive_destination = true;
 		std::cout << "reached RED headquarter with " << my_hp << " elements and force " << power << std::endl;
-        return;
+        return true;
 	}
     
     print_name();
-    std::cout << "marched to city " << In_city << my_hp << " elements and force " << power << std::endl;
-    return;
+    std::cout << "marched to city " << In_city <<" with " << my_hp << " elements and force " << power << std::endl;
+    return false;
 }
 
 weapon* Warrior::lost_weapon() {
@@ -81,7 +84,7 @@ void Warrior::use_arrow() {
     return;
 }
 
-double Warrior::start_war() {//½øĞĞÖ÷¶¯¹¥»÷£¬·µ»ØÖµÎªÔì³ÉµÄÉËº¦
+double Warrior::start_war() {//è¿›è¡Œä¸»åŠ¨æ”»å‡»ï¼Œè¿”å›å€¼ä¸ºé€ æˆçš„ä¼¤å®³
     
     double hurt = power;
     bool is_lost=false;
@@ -93,8 +96,8 @@ double Warrior::start_war() {//½øĞĞÖ÷¶¯¹¥»÷£¬·µ»ØÖµÎªÔì³ÉµÄÉËº¦
         sword* s = dynamic_cast<sword*>(my_weapon);
         is_lost = s->lost_weapon();
     }
-    //std::cout << "[DEBUG]Ö÷¶¯¹¥»÷²âÊÔ"<<hurt << std::endl;
-    //std::cout << "[DEBUG]ÎäÆ÷ÀàĞÍ" << my_weapon.kind <<my_weapon.power<< std::endl;
+    //std::cout << "[DEBUG]ä¸»åŠ¨æ”»å‡»æµ‹è¯•"<<hurt << std::endl;
+    //std::cout << "[DEBUG]æ­¦å™¨ç±»å‹" << my_weapon.kind <<my_weapon.power<< std::endl;
     if (is_lost) {
         delete my_weapon;
         my_weapon = nullptr;
@@ -111,7 +114,7 @@ bool Warrior::get_hurt(double hurt) {
             lion* l = dynamic_cast<lion*>(this);
             l->life_to_transfer = l->my_hp;
         }
-        std::cout << "[PROCESS]¸ÃÎäÊ¿ËÀÍö" << std::endl;
+        std::cout << "[PROCESS]è¯¥æ­¦å£«æ­»äº¡" << std::endl;
         this->is_dead = true;
         this->my_hp = 0;
         return true;
@@ -120,14 +123,25 @@ bool Warrior::get_hurt(double hurt) {
     return false;
 }
 
-double Warrior::fight_back() {//½øĞĞ·´»÷
-    //¼ÓÈëninja²»·´»÷µÄÅĞ¶Ï
+double Warrior::fight_back() {//è¿›è¡Œåå‡»
+    //åŠ å…¥ninjaä¸åå‡»çš„åˆ¤æ–­
     if (kind == "ninja") {
         return 0;
     }
+   
+    bool  is_lost = false;
     double hurt = int(power/2);
+    if (my_weapon == nullptr) {
+        return hurt;
+    }
     if (my_weapon->kind == "sword") {
         hurt += my_weapon->power;
+        sword* s = dynamic_cast<sword*>(my_weapon);
+        is_lost = s->lost_weapon();
+    }
+    if (is_lost) {
+        delete my_weapon;
+        my_weapon = nullptr;
     }
     return hurt;
 }
@@ -136,7 +150,7 @@ void Warrior::report_weapon() {
     print_name();
     std::cout << "has ";
     if (my_weapon != nullptr) {
-        std::cout << my_weapon->kind << "(" << my_weapon->power << ") " << std::endl;
+        my_weapon->print_info();
 	}
     else {
         std::cout << "no weapon";
@@ -171,7 +185,7 @@ int dragon::get_morale() {
     return morale;
 }
 
-void dragon::yell(bool win) {
+void dragon::yell(bool win,int t,int min) {
     if (win) {
         morale += 0.2;
     }
@@ -179,7 +193,9 @@ void dragon::yell(bool win) {
         morale -= 0.2;
     }
     if (morale > 0.8) {
-        std::cout << "yelled at " << In_city << std::endl;
+        std::cout << t << ":" << min << " ";
+        print_name();
+        std::cout << "yelled at city " << In_city << std::endl;
     }
 }
 
@@ -200,6 +216,14 @@ ninja::ninja(int id) {
     //std::cout << "[DEBUG]NINJA_W1:" << this->my_weapon.kind << std::endl;
     //std::cout << "[DEBUG]NINJA_W1:" << this->my_weapon2.kind << std::endl;
 };
+
+std::string ninja::get_weapon2() {
+	if (my_weapon2 == nullptr) {
+		return "no weapon";
+	}
+	return my_weapon2->kind;
+
+}
 
 void ninja::use_arrow() {
     	bool is_lost = false;
@@ -226,11 +250,11 @@ void ninja::report_weapon() {
     print_name();
     std::cout << "has ";
     if (my_weapon) {
-        std::cout<<my_weapon->kind<<"("<<my_weapon->power<<") ";
+        my_weapon->print_info();
         have_weapon = true;
     }
     if (my_weapon2) {
-		std::cout << my_weapon2->kind << "(" << my_weapon2->power << ") ";
+        my_weapon2->print_info();
 		have_weapon = true;
 	}
     if (!have_weapon) {
@@ -255,10 +279,10 @@ iceman::iceman(int id) {
     this->set_kind("iceman");
 }
 
-void iceman::decrease_life() {//ÔÚÇ°½øºóµ÷ÓÃ
+void iceman::decrease_life() {//åœ¨å‰è¿›åè°ƒç”¨
     if (step % 2 == 0) {
-        if (HP > 9) {
-            HP -= 9;
+        if (my_hp > 9) {
+             my_hp-= 9;
             power += 20;
         }
         else {
@@ -311,14 +335,60 @@ void wolf::use_arrow() {
     return;
 }
 
+double wolf::start_war() {
+	double hurt = power;
+    bool is_lost=false;
+	if (my_sword != nullptr) {
+		hurt += my_sword->power;
+        is_lost = my_sword->lost_weapon();
+	}
+    if (is_lost) {
+        delete my_sword;
+        my_sword = nullptr;
+    }
+	return hurt;
+}
+
+double wolf::fight_back() {
+    double hurt = int(power/2);
+    bool is_lost=false;
+if (my_sword != nullptr) {
+		hurt += my_sword->power;
+        is_lost=my_sword->lost_weapon();
+	}
+if (is_lost) {
+    delete my_sword;
+    my_sword = nullptr;
+}
+return hurt;
+}
+
 void wolf::report_weapon() {
     bool have_weapon = false;
+    print_name();
+    std::cout << "has ";
     if (have_arrow) {
         std::cout<< "arrow(" << 3-my_arrow->used_cnt << ") ";
+        have_weapon = true;
     }
+    if (have_bomb) {
+        std::cout << "bomb";
+        have_weapon = true;
+    }
+    if (have_sword) {
+        std::cout << "sword(" << my_sword->power << ")";
+        have_weapon = true;
+    }
+    if (!have_weapon) {
+        std::cout << "no weapon";
+    }
+    std::cout << std::endl;
 }
 
 void wolf::pick_weapon(weapon* w) {
+    if (w == nullptr) {
+        return;
+    }
     std::string kind = w->kind;
     if (kind == "bomb"){
         if (!have_bomb) {

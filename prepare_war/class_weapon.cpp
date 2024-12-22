@@ -1,4 +1,4 @@
-#include"weapon.h"
+ï»¿#include"weapon.h"
 void weapon::operator=(const weapon& w) {
     this->power = w.power;
     this->kind = w.kind;
@@ -19,7 +19,7 @@ weapon* create_weapon(int choice,int p) {
         w_forme = new arrow();
         break;
     default:
-        std::cout << "´íÎó£¬Ìø¹ý" << std::endl;
+        std::cout << "é”™è¯¯ï¼Œè·³è¿‡" << std::endl;
         return w_forme;
 
     }

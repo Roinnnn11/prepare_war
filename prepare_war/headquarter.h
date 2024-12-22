@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef MOSHOU_H
 #define MOSHOU_H
 #include<iostream>
@@ -12,10 +12,14 @@ private:
     int HP_sum;
     int make_warrior_order[5];//0:dragon,1:ninja,...
     int sum_cnt_warriors = 0;
-    int cnt_of_different_warriors[5] = { 0 };//²»·ÁÉèË³ĞòÎªdragon¡¢ninja¡¢iceman¡¢lion¡¢wolf
+    int cnt_of_different_warriors[5] = { 0 };//ä¸å¦¨è®¾é¡ºåºä¸ºdragonã€ninjaã€icemanã€lionã€wolf
     std::vector<Warrior*> list_of_warriors;
     bool is_stop_creating = false;
+    int stop_creating_at=0;
 public:
+    int des;//ç›®çš„åœ°ï¼Œçº¢æ–¹ä¸ºn+1ï¼Œè“æ–¹ä¸º0
+    int base;//åŸºåœ°ä½ç½®ï¼Œçº¢æ–¹ä¸º0ï¼Œè“æ–¹ä¸ºn+1
+    int TakeDown;//è¿›å…¥å¯¹æ–¹åŸºåœ°çš„æ­¦å£«ä¸ªæ•°
     HeadQuarter(int m, std::string new_name);
     ~HeadQuarter();
     void show_kind_of_warrior(int order);
@@ -32,14 +36,14 @@ public:
     std::vector<Warrior*> get_list_of_warriors();
     Warrior* get_warrior();
     void add_HP(int hp);
-    //°´ÕÕÊ±¼äµãµÄÒ»ÏµÁĞ²Ù×÷
-    void lion_run(int t,int min);//Ê¨×ÓÌÓÅÜ
-    void march(int t,int min);//ÎäÊ¿Ç°½ø
+    //æŒ‰ç…§æ—¶é—´ç‚¹çš„ä¸€ç³»åˆ—æ“ä½œ
+    void lion_run(int t,int min);//ç‹®å­é€ƒè·‘
+    void march(int t,int min);//æ­¦å£«å‰è¿›
     
-    void reward();//Õ½¶·Ö®ºó·¢·Å½±Àø£¨¶ÔÓ®ÁËµÄ£©
-    void clear_dead();//Çå³ıËÀÍöµÄÎäÊ¿
-    void report_hp();//»ã±¨ÉúÃüÔª
-    void report_warrior();//ÈÃÎäÊ¿»ã±¨ÎäÆ÷Çé¿ö
+    void reward();//æˆ˜æ–—ä¹‹åå‘æ”¾å¥–åŠ±ï¼ˆå¯¹èµ¢äº†çš„ï¼‰
+    void clear_dead();//æ¸…é™¤æ­»äº¡çš„æ­¦å£«
+    void report_hp();//æ±‡æŠ¥ç”Ÿå‘½å…ƒ
+    void report_warrior(int t,int min);//è®©æ­¦å£«æ±‡æŠ¥æ­¦å™¨æƒ…å†µ
 };
 
 

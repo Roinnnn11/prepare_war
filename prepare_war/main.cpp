@@ -7,46 +7,60 @@
 #include"weapon.h"
 #include"warrior.h"
 #include"city.h"
+#include"OneRound.h"
 int dragon::HP = 0;
 int ninja::HP = 0;
 int iceman::HP = 0;
 int lion::HP = 0;
 int wolf::HP = 0;
+int dragon::d_power = 0;
+int ninja::n_power = 0;
+int iceman::i_power = 0;
+int lion::l_power = 0;
+int wolf::w_power = 0;
+double lion::K = 0;
 int main() {
     std::string r = "RED";
     std::string b = "BLUE";
     int cnt;
     std::cin >> cnt;
-    int M,N,R,K,T;
+    int M,N,r_arrow,K,T;
     for (int i = 0; i < cnt; i++) {
-        std::cin >> M;
+        std::cin >> M>>N>>r_arrow>>lion::K>>T;
         HeadQuarter R(M, r);
         HeadQuarter B(M, b);
-        
+        cities C(N);
+        C.R = r_arrow;
+        R.des = N + 1, B.des = 0;
+        R.base = 0,B.base = N + 1;
         std::cin >> dragon::HP>>ninja::HP>>iceman::HP>>lion::HP>>wolf::HP;
-
+        std::cin >> dragon::d_power >> ninja::n_power >> iceman::i_power >> lion::l_power >> wolf::w_power;
         R.set_order_for_HeadQuarter(0);//0\1是固定模式，也可以自己输入武士顺序；
         B.set_order_for_HeadQuarter(1);
         int t = 0;
-        bool res1, res2;
-        res1 = false, res2 = false;
-        while (res1 == false || res2 == false) {
-            if (res1 == false) {
+        int res;
+
+        std::cout<<"Case:"<<i+1<<std::endl;
+        while (t<T) {
                 R.create_warrior(t);
-            }
-            if (res2 == false) {
                 B.create_warrior(t);
+            res = Round(&R, &B, &C, t);
+            if (res == 0) {
+                t++;
+                continue;
             }
-            res1 = R.get_is_stop_creating();
-            res2 = B.get_is_stop_creating();
-            t++;
+            if (res == 1) {
+                std::cout << t << ":10 ";
+                std::cout<<"red headquarter was taken"<<std::endl;
+                break;
+            }
+            else if (res == -1) {
+                std::cout << t << ":10 ";
+                std::cout<<"blue headquarter was taken"<<std::endl;
+                break;
+            }
+       
         }
-        city A(1);
-        A.red_warrior = R.get_warrior();
-        A.blue_warrior = B.get_warrior();
-        std::cout << "种类" << A.blue_warrior->get_kind() << std::endl;
-        std::cout << "种类" << A.red_warrior->get_kind() << std::endl;
-        A.to_start_war();
 
         std::cout << std::endl << "**********第" << i << "轮测试结束**********" << std::endl;
          //R.~HeadQuarter();

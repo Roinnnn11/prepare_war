@@ -1,4 +1,4 @@
-#include"city.h"
+ï»¿#include"city.h"
 #include"warrior.h"
 void city::create_HP() {
 	HP += 10;
@@ -8,8 +8,10 @@ city::city(int i) {
 	ID = i;
 	red_warrior = nullptr;
 	blue_warrior = nullptr;
-	have_bomb = false;
-	have_arrow = false;
+	red_have_bomb = false;
+	blue_have_bomb = false;
+	red_have_arrow = false;
+	blue_have_arrow = false;
 	who_to_start = false;
 	red_win = false;
 	blue_win = false;
@@ -24,90 +26,179 @@ void city::enter_city(Warrior* w) {
 	if (w->belong_headquater == "BLUE") {
 		blue_warrior = w;
 	}
-
-	if (w->get_kind() == "wolf") {//Èç¹ûÊÇÀÇ£¬¶ÔÆäÌØÅĞ£¬¾ßÓĞÊ²Ã´ÎäÆ÷
-		wolf* wf = dynamic_cast<wolf*>(w);;
+	if (w->get_kind() == "wolf") {//å¦‚æœæ˜¯ç‹¼ï¼Œå¯¹å…¶ç‰¹åˆ¤ï¼Œå…·æœ‰ä»€ä¹ˆæ­¦å™¨
+		wolf* wf = dynamic_cast<wolf*>(w);
 		if (wf->have_bomb) {
-			have_bomb = true;
-		}
+			if (wf->belong_headquater == "RED") {
+				red_have_bomb = true;
+			}
+			else {
+				blue_have_bomb = true;
+			}
+		}//have_bomb
 		if (wf->have_arrow) {
-			have_arrow = true;
+			if (wf->belong_headquater == "RED") {
+				red_have_arrow = true;
+			}
+			else {
+				blue_have_arrow = true;
+			}
 		}
 		return;
+	}//wolf
+	if (w->get_kind() == "ninja") {
+		ninja* n = dynamic_cast<ninja*>(w);
+		std::string kind1 = n->get_weapon();
+		std::string kind2 = n->get_weapon2();
+		if (kind1 == "bomb" || kind2 == "bomb") {
+			if (n->belong_headquater == "RED") {
+				red_have_bomb = true;
+			}
+			else {
+				blue_have_bomb = true;
+			}
+		}//have_bomb
+		if (kind1 == "arrow" || kind2 == "arrow") {
+			if (n->belong_headquater == "RED") {
+				red_have_arrow = true;
+			}
+			else {
+				blue_have_arrow = true;
+			}
+		}
 	}
-
-	if (w->get_weapon() == "bomb") {
-		have_bomb = true;
-	}
-	if (w->get_weapon() == "arrow") {
-		have_arrow = true;
+	std::string kind = w->get_weapon();
+	if (kind == "bomb") {
+		if (w->belong_headquater == "RED") {
+			red_have_bomb = true;
+		}
+		else {
+			blue_have_bomb = true;
+		}
+	}//HAVE_BOMB
+	if (kind == "arrow") {
+		if(w->belong_headquater=="RED"){
+			red_have_arrow = true;
+		}
+		else {
+			blue_have_arrow = true;
+		}
 	}
 }
 
-bool city::predict_bomb() {
-	if (blue_warrior->get_weapon() != "bomb" && red_warrior->get_weapon() != "bomb") {//Ã»ÓĞÕ¨µ¯
-		return false;//·µ»Ø²»Ê¹ÓÃ
+int city::predict_bomb() {//*************éœ€è¦å®Œå–„************
+	//0:ä¸ç”¨ï¼Œ-1ï¼šçº¢æ–¹ç”¨ï¼Œ1ï¼šè“æ–¹ç”¨
+	int use_bomb = 0;
+	if (!red_have_bomb&&!blue_have_bomb) {
+		return 0;
+	}
+	if (!red_warrior || !blue_warrior) {
+		return 0;
 	}
 	double hurt1,hurt2;
-	if (red_warrior->get_weapon() == "bomb" && who_to_start) {//ºì·½ÓµÓĞÕ¨µ¯&&·¢Æğ½ø¹¥
+	if (red_have_bomb && who_to_start) {//çº¢æ–¹æ‹¥æœ‰ç‚¸å¼¹&&å‘èµ·è¿›æ”»
 		hurt1 = red_warrior->start_war();
-		if (blue_warrior->get_HP() <= hurt1) {//À¶·½±ØËÀ
-			return false;
+		//**********åŠ å…¥ç‰¹åˆ¤
+		if (red_warrior->get_kind() == "ninja") {
+			ninja *n = dynamic_cast<ninja*>(red_warrior);
+			hurt1 = n->start_war();
 		}
-		else {
+		else if (red_warrior->get_kind() == "wolf") {
+			wolf* w = dynamic_cast<wolf*>(red_warrior);
+			hurt1 = w->start_war();
+		}
+		//********ç‰¹åˆ¤ç»“æŸ
+
+		if (blue_warrior->get_HP() > hurt1) {//è“æ–¹ä¸æ­»ï¼Œå‘èµ·åå‡»
 			hurt2 = blue_warrior->fight_back();
-			if (red_warrior->get_HP() <= hurt2) {//ºì·½ÊÜ·´»÷¶øËÀ
-				return true;
+		//ç‰¹åˆ¤
+			if (blue_warrior->get_kind() == "ninja") {
+				ninja *n2 = dynamic_cast<ninja*>(blue_warrior);
+				hurt2 = n2->fight_back();
 			}
-			else {
-				return false;
+			else if(blue_warrior->get_kind()=="wolf"){
+				wolf* w2 = dynamic_cast<wolf*>(blue_warrior);
+				hurt2 = w2->fight_back();
+			}
+			//*******ç‰¹åˆ¤ç»“æŸ
+			if (red_warrior->get_HP() <= hurt2) {//çº¢æ–¹å—åå‡»è€Œæ­»
+				use_bomb = -1;
 			}
 		}
-	}
-	if (red_warrior->get_weapon() == "bomb" && !who_to_start) {//ºì·½ÓµÓĞÕ¨µ¯&&·´»÷
+	}//çº¢æ–¹æ‹¥æœ‰ç‚¸å¼¹&&å‘èµ·è¿›æ”»
+	if (red_have_bomb && !who_to_start) {//çº¢æ–¹æ‹¥æœ‰ç‚¸å¼¹&&åå‡»
 		hurt1 = blue_warrior->start_war();
+		//ç‰¹åˆ¤
+		if (blue_warrior->get_kind() == "ninja") {
+			ninja* n3 = dynamic_cast<ninja*>(blue_warrior);
+			hurt1 = n3->start_war();
+		}
+		else if (blue_warrior->get_kind() == "wolf") {
+			wolf* w3 = dynamic_cast<wolf*>(blue_warrior);
+			hurt1 = w3->start_war();
+		}
+		//*******ç‰¹åˆ¤ç»“æŸ
 		if (red_warrior->get_HP() <= hurt1) {
-			return true;
-		}
-		else {
-			return false;
+			use_bomb = -1;
 		}
 	}
-	//ºìÀ¶½»»»
-	if (blue_warrior->get_weapon() == "bomb" && !who_to_start) {//blue·½ÓµÓĞÕ¨µ¯&&·¢Æğ½ø¹¥
+	//çº¢è“äº¤æ¢
+	if (blue_have_bomb && !who_to_start) {//blueæ–¹æ‹¥æœ‰ç‚¸å¼¹&&å‘èµ·è¿›æ”»
 		hurt1 = blue_warrior->start_war();
-		if (red_warrior->get_HP() <= hurt1) {//red·½±ØËÀ
-			return false;
+		//ç‰¹åˆ¤
+		if (blue_warrior->get_kind() == "ninja") {
+			ninja* n4 = dynamic_cast<ninja*>(blue_warrior);
+			hurt1 = n4->start_war();
 		}
-		else {
+		else if (blue_warrior->get_kind() == "wolf") {
+			wolf* w4 = dynamic_cast<wolf*>(blue_warrior);
+			hurt1 = w4->start_war();
+		}
+		//*******ç‰¹åˆ¤ç»“æŸ
+		if (red_warrior->get_HP() >hurt1) {//redåå‡»
 			hurt2 = red_warrior->fight_back();
-			if (blue_warrior->get_HP() <= hurt2) {//blue·½ÊÜ·´»÷¶øËÀ
-				return true;
+			//**********åŠ å…¥ç‰¹åˆ¤
+			if (red_warrior->get_kind() == "ninja") {
+				ninja* n5 = dynamic_cast<ninja*>(red_warrior);
+				hurt2 = n5->fight_back();
 			}
-			else {
-				return false;
+			else if (red_warrior->get_kind() == "wolf") {
+				wolf* w5 = dynamic_cast<wolf*>(red_warrior);
+				hurt2 = w5->fight_back();
+			}
+			//********ç‰¹åˆ¤ç»“æŸ
+			if (blue_warrior->get_HP() <= hurt2) {//blueæ–¹å—åå‡»è€Œæ­»
+				use_bomb = 1;//è“æ–¹ä½¿ç”¨ç‚¸å¼¹
 			}
 		}
 	}
-	if (blue_warrior->get_weapon() == "bomb" && who_to_start) {//blue·½ÓµÓĞÕ¨µ¯&&·´»÷
+	if (blue_have_bomb && who_to_start) {//blueæ–¹æ‹¥æœ‰ç‚¸å¼¹&&åå‡»
 		hurt1 = red_warrior->start_war();
-		if (blue_warrior->get_HP() <= hurt1) {
-			return true;
+		//**********åŠ å…¥ç‰¹åˆ¤
+		if (red_warrior->get_kind() == "ninja") {
+			ninja* n6 = dynamic_cast<ninja*>(red_warrior);
+			hurt1 = n6->start_war();
 		}
-		else {
-			return false;
+		else if (red_warrior->get_kind() == "wolf") {
+			wolf* w6 = dynamic_cast<wolf*>(red_warrior);
+			hurt1 = w6->start_war();
+		}
+		//********ç‰¹åˆ¤ç»“æŸ
+		if (blue_warrior->get_HP() <= hurt1) {
+			use_bomb = 1;
 		}
 	}
+	return use_bomb;
 }
 
-void city::use_bomb(int t,int min) {
+void city::use_bomb(int t,int min,int choice) {
 	std::cout << t << ":" << min << " ";
-	if (red_warrior->get_weapon() == "bomb") {
+	if (choice==-1) {
 		red_warrior->print_name();
 		std::cout <<  "used a bomb and killed ";
 		blue_warrior->print_name();	
 	}
-	if (blue_warrior->get_weapon() == "bomb") {
+	if (choice==1) {
 		blue_warrior->print_name();
 		std::cout << "used a bomb and killed ";
 		red_warrior->print_name();
@@ -134,40 +225,64 @@ void city::who_start() {
 	}
 }
 
-bool city::war() {
+bool city::war(int t,int min) {
 	bool res = true;
-	double hurt1, hurt2;//Á½Õß²úÉúµÄÉËº¦
+	double hurt1, hurt2;//ä¸¤è€…äº§ç”Ÿçš„ä¼¤å®³
 	bool win1, win2;
-	if (who_to_start) {//ºì·½·¢Æğ½ø¹¥
-		hurt1 = red_warrior->start_war();//·¢ÆğÕ½Õù£¬hurt1ÊÇÔì³ÉµÄÉËº¦
-		//Êä³ö·¢ÆğÕ½ÕùµÄĞÅÏ¢
+	if (who_to_start) {//çº¢æ–¹å‘èµ·è¿›æ”»
+		hurt1 = red_warrior->start_war();//å‘èµ·æˆ˜äº‰ï¼Œhurt1æ˜¯é€ æˆçš„ä¼¤å®³
+		//å¯¹ninja\wolfç‰¹åˆ¤ï¼Œå¯èƒ½æ”¹å˜hurtçš„å€¼
+		if(red_warrior->get_kind()=="ninja"){
+			ninja* n = dynamic_cast<ninja*>(red_warrior);
+			hurt1 = n->start_war();
+		}
+		else if (red_warrior->get_kind() == "wolf") {
+			wolf *w = dynamic_cast<wolf*>(red_warrior);
+			hurt1 = w->start_war();
+		}
+
+		//è¾“å‡ºå‘èµ·æˆ˜äº‰çš„ä¿¡æ¯
+		std::cout << t << ":" << min << " ";
 		red_warrior->print_name();
 		std::cout << "attacked ";
 		blue_warrior->print_name();
 		std::cout << "in city " << ID << " with " << red_warrior->get_HP() << " elements and force " << red_warrior->get_power() << std::endl;
 		//
-		win1 = blue_warrior->get_hurt(hurt1);//À¶·½ÊÜÉË£¬²¢ÅĞ¶ÏÊÇ·ñËÀÍö
+		win1 = blue_warrior->get_hurt(hurt1);//è“æ–¹å—ä¼¤ï¼Œå¹¶åˆ¤æ–­æ˜¯å¦æ­»äº¡
 		if (win1) {
-			std::cout << "[PROCESS]ºì·½Ê¤Àû" << std::endl;
-			//Êä³öËÀÍöĞÅÏ¢
+			std::cout << "[PROCESS]çº¢æ–¹èƒœåˆ©" << std::endl;
+			//è¾“å‡ºæ­»äº¡ä¿¡æ¯
+			std::cout << t << ":" << min << " ";
 			blue_warrior->print_name();
 			std::cout<< "was killed in city " << ID << std::endl;
 			//
-			red_warrior->is_winner = true;//±ê¼Çºì·½Ê¤Àû£¬À¶·½ËÀÍö
+			red_warrior->is_winner = true;//æ ‡è®°çº¢æ–¹èƒœåˆ©ï¼Œè“æ–¹æ­»äº¡
 			blue_warrior->is_dead = true;
 		}
 		else {
-			//Êä³ö·´»÷ĞÅÏ¢
+			//è¾“å‡ºåå‡»ä¿¡æ¯
+			std::cout << t << ":" << min << " ";
 			blue_warrior->print_name();
 			std::cout << "fought back against ";
 			red_warrior->print_name();
 			std::cout << "In city " << ID << std::endl;
 			//
-			hurt2 = blue_warrior->fight_back();//À¶·½·¢Æğ·´»÷
-			win2 = red_warrior->get_hurt(hurt2);//ºì·½ÊÜÉË£¬²¢ÅĞ¶ÏÊÇ·ñËÀÍö
+			hurt2 = blue_warrior->fight_back();//è“æ–¹å‘èµ·åå‡»
+			//ç‰¹åˆ¤ninja&wolf
+			if (blue_warrior->get_kind() == "ninja")  {
+				ninja *n2 = dynamic_cast<ninja*>(blue_warrior);
+				hurt2 = n2->fight_back();
+			}
+			else if (blue_warrior->get_kind() == "wolf") {
+				wolf* w2 = dynamic_cast<wolf*>(blue_warrior);
+				hurt2 = w2->fight_back();
+			}
+
+			win2 = red_warrior->get_hurt(hurt2);//çº¢æ–¹å—ä¼¤ï¼Œå¹¶åˆ¤æ–­æ˜¯å¦æ­»äº¡
 			if (win2) {
-				std::cout << "[PROCESS]Blue·½Ê¤Àû" << std::endl;
-				//Êä³öËÀÍöĞÅÏ¢
+				std::cout << "[PROCESS]Blueæ–¹èƒœåˆ©" << std::endl;
+				//è¾“å‡ºæ­»äº¡ä¿¡æ¯
+				std::cout << t << ":" << min << " ";
 				red_warrior->print_name();
 				std::cout << "was killed in city " << ID << std::endl;
 				//
@@ -177,9 +292,10 @@ bool city::war() {
 		}
 		
 	}
-	else {//À¶·½ÏÈ·¢Æğ½ø¹¥
+	else {//è“æ–¹å…ˆå‘èµ·è¿›æ”»
 		hurt1 = blue_warrior->start_war();
-		//Êä³ö·¢ÆğÕ½ÕùµÄĞÅÏ¢
+		//è¾“å‡ºå‘èµ·æˆ˜äº‰çš„ä¿¡æ¯
+		std::cout << t << ":" << min << " ";
 		blue_warrior->print_name();
 		std::cout << "attacked ";
 		red_warrior->print_name();
@@ -187,8 +303,9 @@ bool city::war() {
 		//
 		win1 = red_warrior->get_hurt(hurt1);
 		if (win1) {
-			std::cout << "[PROCESS]blue·½Ê¤Àû" << std::endl;
-			//Êä³öËÀÍöĞÅÏ¢
+			std::cout << "[PROCESS]blueæ–¹èƒœåˆ©" << std::endl;
+			//è¾“å‡ºæ­»äº¡ä¿¡æ¯
+			std::cout << t << ":" << min << " ";
 			red_warrior->print_name();
 			std::cout << "was killed in city " << ID << std::endl;
 			//
@@ -197,7 +314,8 @@ bool city::war() {
 		}
 		else {
 			hurt2 = red_warrior->fight_back();
-			//Êä³ö·´»÷ĞÅÏ¢
+			//è¾“å‡ºåå‡»ä¿¡æ¯
+			std::cout << t << ":" << min << " ";
 			red_warrior->print_name();
 			std::cout << "fought back against ";
 			blue_warrior->print_name();
@@ -205,48 +323,49 @@ bool city::war() {
 			//
 			win2 = blue_warrior->get_hurt(hurt2);
 			if (win2) {
-				std::cout << "[PROCESS]ºì·½Ê¤Àû" << std::endl;
-				//Êä³öËÀÍöĞÅÏ¢
+				std::cout << "[PROCESS]çº¢æ–¹èƒœåˆ©" << std::endl;
+				//è¾“å‡ºæ­»äº¡ä¿¡æ¯
+				std::cout << t << ":" << min << " ";
 				blue_warrior->print_name();
 				std::cout << "was killed in city " << ID << std::endl;
 				//
-				red_warrior->is_winner = true;//±ê¼Çºì·½Ê¤Àû£¬À¶·½ËÀÍö
+				red_warrior->is_winner = true;//æ ‡è®°çº¢æ–¹èƒœåˆ©ï¼Œè“æ–¹æ­»äº¡
 				blue_warrior->is_dead = true;
 			}
 		}
 	}
 	if (!win1 && !win2) {
 		res = false;
-		std::cout << "[PROCESS]Æ½¾Ö" << std::endl;
+		std::cout << "[PROCESS]å¹³å±€" << std::endl;
 	}
 	return res;
 
 }
 
-void city::judge_yell() {
-	//¶Ôdragon»¶ºôµÄÅĞ¶¨
+void city::judge_yell(int t,int min) {
+	//å¯¹dragonæ¬¢å‘¼çš„åˆ¤å®š
 	if (red_warrior->get_kind() == "dragon" && !red_warrior->is_dead) {
 		dragon* d = dynamic_cast<dragon*> (red_warrior);
 		if (red_warrior->is_winner) {
-			d->yell(1);
+			d->yell(1,t,min);
 		}
 		else {
-			d->yell(0);
+			d->yell(0,t,min);
 		}
 	}
 	if (blue_warrior->get_kind() == "dragon" && !blue_warrior->is_dead) {
 		dragon* d2 = dynamic_cast<dragon*> (blue_warrior);
 		if (blue_warrior->is_winner) {
-			d2->yell(1);
+			d2->yell(1,t,min);
 		}
 		else {
-			d2->yell(0);
+			d2->yell(0,t,min);
 		}
 	}
 }
 
 void city::judge_transfer() {
-	//¶Ôlion×ªÒÆÉúÃüÖµ
+	//å¯¹lionè½¬ç§»ç”Ÿå‘½å€¼
 	if (red_warrior->get_kind() == "lion" && red_warrior->is_dead ) {
 		lion* l = dynamic_cast<lion*>(red_warrior);
 		blue_warrior->add_HP(l->life_to_transfer);
@@ -260,7 +379,7 @@ void city::judge_transfer() {
 }
 
 void city::judge_pick() {
-	//¶ÔwolfÅĞ¶ÏÊÇ·ñ¼ñÆğÎäÆ÷
+	//å¯¹wolfåˆ¤æ–­æ˜¯å¦æ¡èµ·æ­¦å™¨
 	if (red_warrior->get_kind() == "wolf" && red_warrior->is_winner) {
 		wolf* w = dynamic_cast<wolf*>(red_warrior);
 		w->pick_weapon(blue_warrior->lost_weapon());
@@ -286,11 +405,12 @@ void city::judge_loyality() {
 	return;
 }
 
-void city::to_flag() {
+void city::to_flag(int t,int min) {
 	if (red_win ) {
 		if (red_warrior->is_winner) {
 			is_flag = true;
 			flag = "RED";
+			std::cout << t << ":" << min << " ";
 			std::cout<<"RED flag raised in city "<<ID<<std::endl;
 		}
 		else {
@@ -301,6 +421,7 @@ void city::to_flag() {
 		if(blue_warrior->is_winner){
 			is_flag = true;
 			flag = "BLUE";
+			std::cout << t << ":" << min << " ";
 			std::cout << "BLUE flag raised in city " << ID << std::endl;
 		}
 		else {
@@ -309,23 +430,17 @@ void city::to_flag() {
 	}
 }
 
-void city::to_start_war() {
+void city::to_start_war(int t,int min) {
 	if (red_warrior == nullptr || blue_warrior == nullptr) {
 		return;
 	}
-	if (have_bomb) {
-		bool pred = predict_bomb();
-		if (pred) {
-			use_bomb();
-			return;
-		}
-	}
-	bool res = this->war();
+	have_war = true;
+	bool res = this->war(t,min);
 	if (res) {
-		judge_yell();
+		judge_yell(t,min);
 		judge_transfer();
 		judge_pick();
-		to_flag();
+		to_flag(t,min);
 	}
 	else {
 		judge_loyality();
@@ -334,16 +449,28 @@ void city::to_start_war() {
 }
 
 
+void city::warrior_leave() {
+	red_warrior = nullptr;
+	blue_warrior = nullptr;
+	red_have_bomb = false;
+	blue_have_bomb = false;
+	red_have_arrow = false;
+	blue_have_arrow = false;
+	who_to_start = false;
+	have_war = false;
+}
+
 int city::took_HP() {
 	int res = HP;
 	HP = 0;
 	return res;
 }
 
-cities::cities() {
-	for (int i = 1; i <= N; i++) {
-		city c(i);
-		city_list.push_back(&c);
+cities::cities(int n) {
+	N = n;
+	for (int i = 0; i <= n+1; i++) {
+		city* c= new city(i);
+		city_list.push_back(c);
 	}
 }
 
@@ -359,7 +486,7 @@ void cities::warrior_enter_city(HeadQuarter* red, HeadQuarter* blue) {
 	for (int i = 0; i < red_list.size(); i++) {
 		Warrior* w = red_list[i];
 		if(!w->arrive_destination)
-		city_list[w->In_city]->enter_city(w);//¡°½øÈë³ÇÊĞ¡±
+		city_list[w->In_city]->enter_city(w);//â€œè¿›å…¥åŸå¸‚â€
 	}
 	for (int i = 0; i < blue_list.size(); i++) {
 		Warrior* w2 = blue_list[i];
@@ -371,56 +498,72 @@ void cities::warrior_enter_city(HeadQuarter* red, HeadQuarter* blue) {
 
 void cities::use_arrow() {
 	for (int i = 1; i < city_list.size(); i++) {
-		city *c = city_list[i];
-		if (city_list[i]->have_arrow) {//ÕÒµ½ÓĞarrowµÄ³ÇÊĞ£¬ÔÙ¸ù¾İÏÂÒ»¸ö³ÇÊĞÊÇ·ñÓĞµĞÈË£¬ÅĞ¶ÏÊÇ·ñÊ¹ÓÃ
-			if (c->red_warrior->get_weapon() == "arrow") {
-				if (i < city_list.size() - 2) {
-					city* c1 = city_list[i + 1];
-					if (c1->blue_warrior) {
-						c->red_warrior->use_arrow();
-						c1->blue_warrior->get_hurt(R);
-						if (c1->blue_warrior->is_dead) {//Èç¹ûÉäÉ±£¬Êä³öĞÅÏ¢
-							c->red_warrior->print_name();
-							std::cout << "shot and killed ";
-							c1->blue_warrior->print_name();
-							
-							c1->blue_warrior = nullptr;
-						}
-						else {//Êä³öÏàÓ¦ĞÅÏ¢
-							c->red_warrior->print_name();
-							std::cout<< "shot ";
-							
-						}
-						std::cout << std::endl;
-					}//c1->blue_warrior
-				}//i<s
-			}//red_arrow
-			if (c->blue_warrior->get_weapon() == "arrow") {//Í¬Àí
-				if (i > 1) {
-					city* c2 = city_list[i - 1];
-					if (c2->red_warrior) {
-						c->blue_warrior->use_arrow();
-						c2->red_warrior->get_hurt(R);
-						if (c2->red_warrior->is_dead) {
-							c->blue_warrior->print_name();
-							std::cout << "shot and killed ";
-							c2->red_warrior->print_name();
-							
-							c2->red_warrior = nullptr;
-						}//is_dead
-						else {
-							c->blue_warrior->print_name();
-							std::cout << "shot";
-						}
-						std::cout << std::endl;
+		city* c = city_list[i];
+		if(c->red_warrior)
+		if (c->red_have_arrow) {//å¦‚æœå­˜åœ¨çº¢æ–¹æ­¦å£«
+			
+			if (i < city_list.size() - 2) {
+				city* c1 = city_list[i + 1];
+				if (c1->blue_warrior) {
+					c->red_warrior->use_arrow();
+					c1->blue_warrior->get_hurt(R);
+					if (c1->blue_warrior->is_dead) {//å¦‚æœå°„æ€ï¼Œè¾“å‡ºä¿¡æ¯
+						c->red_warrior->print_name();
+						std::cout << "shot and killed ";
+						c1->blue_warrior->print_name();
+
+						c1->blue_warrior = nullptr;
+					}
+					else {//è¾“å‡ºç›¸åº”ä¿¡æ¯
+						c->red_warrior->print_name();
+						std::cout << "shot ";
+						
+					}
+					std::cout << std::endl;
+				}//c1->blue_warrior
+			}//i<s
+		}//red_arrow
+		//red_warrior.exist
+		if(c->blue_warrior)
+		if (c->blue_have_arrow) {
+			if (i > 1) {
+				city* c2 = city_list[i - 1];
+				if (c2->red_warrior) {
+					c->blue_warrior->use_arrow();
+					c2->red_warrior->get_hurt(R);
+					if (c2->red_warrior->is_dead) {
+						c->blue_warrior->print_name();
+						std::cout << "shot and killed ";
+						c2->red_warrior->print_name();
+
+						c2->red_warrior = nullptr;
+					}//is_dead
+					else {
+						c->blue_warrior->print_name();
+						std::cout << "shot";
+					}
+					std::cout << std::endl;
 					}//c2.red_warrior
 				}//i>
 			}//blue_arrow
-		}//have_arrow
+		}//for
+	
+}
+
+
+void cities::use_bomb(int t, int min) {
+	for (int i = 1; i < city_list.size(); i++) {
+		city* c = city_list[i];
+		c->who_start();//åˆ¤æ–­è°å…ˆè¿›æ”»
+		int choice = c->predict_bomb();
+			if (choice!=0) {
+				c->use_bomb(t, min,choice);
+			}
+		
 	}
 }
 
-void cities::OneWarrior_took_hp(HeadQuarter* red, HeadQuarter* blue) {
+void cities::OneWarrior_took_hp(HeadQuarter* red, HeadQuarter* blue,int t,int min) {
 	for (int i = 1; i < city_list.size(); i++) {
 		city *c = city_list[i];
 		if (c->red_warrior && c->blue_warrior) {
@@ -432,12 +575,14 @@ void cities::OneWarrior_took_hp(HeadQuarter* red, HeadQuarter* blue) {
 		int gain_hp;
 		if (c->red_warrior && !c->blue_warrior) {
 			 gain_hp = c->took_HP();
+			 std::cout << t << ":" << min << " ";
 			c->red_warrior->print_name();
 			std::cout<<"earned "<<gain_hp<<" elements for his headquarter"<<std::endl;
 			red->add_HP(gain_hp);
 		}
 		if (!c->red_warrior && c->blue_warrior) {
 			gain_hp = c->took_HP();
+			std::cout << t << ":" << min << " ";
 			c->blue_warrior->print_name();
 			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
 			blue->add_HP(gain_hp);
@@ -447,24 +592,44 @@ void cities::OneWarrior_took_hp(HeadQuarter* red, HeadQuarter* blue) {
 	return;
 }
 
-void cities::AfterWar_took_hp(HeadQuarter* red, HeadQuarter* blue) {
+void cities::all_war(int t, int min) {
+	for (int i = 1; i < city_list.size(); i++) {
+		city *c = city_list[i];
+		c->to_start_war(t,min);
+	}
+}
+
+void cities::AfterWar_took_hp(HeadQuarter* red, HeadQuarter* blue,int t,int min) {
 	for (int i = 1; i < city_list.size(); i++) {
 		city* c = city_list[i];
+		if (!c->have_war) {//æ²¡æœ‰å‘ç”Ÿæˆ˜äº‰
+			continue;
+		}
 		int gain_hp;
 		if (c->red_warrior->is_winner) {
 			gain_hp = c->took_HP();
+			std::cout << t << ":" << min << " ";
 			c->red_warrior->print_name();
 			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
 			red->add_HP(gain_hp);
+			c->red_warrior->is_winner = false;//é‡ç½®æ­¦å£«ä¿¡æ¯
 		}
 		else if (c->blue_warrior->is_winner) {
 			gain_hp = c->took_HP();
+			std::cout << t << ":" << min << " ";
 			c->blue_warrior->print_name();
 			std::cout << "earned " << gain_hp << " elements for his headquarter" << std::endl;
 			blue->add_HP(gain_hp);
+			c->blue_warrior->is_winner = false;//é‡ç½®æ­¦å£«ä¿¡æ¯
 		}
 		else {
 			continue;
 		}
+	}
+}
+
+void cities::warrior_leave_city() {
+	for (int i = 1; i < city_list.size(); i++) {
+		city_list[i]->warrior_leave();
 	}
 }

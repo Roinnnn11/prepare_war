@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef WARRIOR_H
 #define WARRIOR_H
 #include<iostream>
@@ -15,12 +15,12 @@ protected:
     double power;
 
 public:
-    std::string belong_headquater; //ËùÊô·½
-    int In_city;//ËùÔÚµÄ³ÇÊĞ±àºÅ
-    int destination;//Ä¿µÄµØ
-    bool is_winner = false;//±ê¼ÇÊ¤ÀûµÄÎäÊ¿
-    bool is_dead = false;//±ê¼ÇËÀÍöµÄÎäÊ¿
-    bool arrive_destination = false;//±ê¼ÇÊÇ·ñµ½´ïÄ¿µÄµØ
+    std::string belong_headquater; //æ‰€å±æ–¹
+    int In_city;//æ‰€åœ¨çš„åŸå¸‚ç¼–å·
+    int destination;//ç›®çš„åœ°
+    bool is_winner = false;//æ ‡è®°èƒœåˆ©çš„æ­¦å£«
+    bool is_dead = false;//æ ‡è®°æ­»äº¡çš„æ­¦å£«
+    bool arrive_destination = false;//æ ‡è®°æ˜¯å¦åˆ°è¾¾ç›®çš„åœ°
     int my_hp;
     
 
@@ -29,20 +29,20 @@ public:
     int get_id(); 
     std::string get_weapon();
     std::string get_kind();
-    void print_name();//Êä³ö¡°»ùµØ ÖÖÀà id¡±
+    void print_name();//è¾“å‡ºâ€œåŸºåœ° ç§ç±» idâ€
     double get_power() {
 		return power;
-	}//Êä³öÎäÊ¿µÄ¹¥»÷Á¦
-    void add_HP(double a);//¼ÓÑª
-    void step_on();//Ç°½ø
-    weapon* lost_weapon();//µôÂäweapon£¨×¨ÃÅÕë¶Ôwolf£©
+	}//è¾“å‡ºæ­¦å£«çš„æ”»å‡»åŠ›
+    void add_HP(double a);//åŠ è¡€
+    bool step_on();//å‰è¿›
+    weapon* lost_weapon();//æ‰è½weaponï¼ˆä¸“é—¨é’ˆå¯¹wolfï¼‰
     
-    virtual void use_arrow();//Ê¹ÓÃarrow
-    virtual double start_war();//Ö÷¶¯¹¥»÷
-    virtual bool get_hurt(double hurt);//ÊÜÉË£¬²¢ÅĞ¶ÏÊÇ·ñËÀÍö
-    virtual double fight_back();//·¢Æğ·´»÷
+    virtual void use_arrow();//ä½¿ç”¨arrow
+    virtual double start_war();//ä¸»åŠ¨æ”»å‡»
+    virtual bool get_hurt(double hurt);//å—ä¼¤ï¼Œå¹¶åˆ¤æ–­æ˜¯å¦æ­»äº¡
+    virtual double fight_back();//å‘èµ·åå‡»
 
-    virtual void report_weapon();//»ã±¨ÎäÆ÷Çé¿ö
+    virtual void report_weapon();//æ±‡æŠ¥æ­¦å™¨æƒ…å†µ
 
     virtual int get_HP() const = 0;
     virtual  void print_info() const= 0;
@@ -52,13 +52,13 @@ void Add_hp_to_warrior(Warrior* w, double hp);
 
 class dragon : public Warrior {
 private:
-    float morale;//Ê¿Æø
+    float morale;//å£«æ°”
 public:
     static int HP;
     static int d_power;
     dragon(int id);
-    void set_morale(int res_life);//´«Èë²ÎÊı:Ê£ÓàÉúÃüÔª
-    void set_weapon_forme();//ÎªÆä´´½¨ÎäÆ÷
+    void set_morale(int res_life);//ä¼ å…¥å‚æ•°:å‰©ä½™ç”Ÿå‘½å…ƒ
+    void set_weapon_forme();//ä¸ºå…¶åˆ›å»ºæ­¦å™¨
     int get_HP() const override {
         return HP;
     };
@@ -67,7 +67,7 @@ public:
     void print_info()const override {
         std::cout << "It has a " << this->my_weapon->kind << ",and it's morale is " << this->morale << std::endl;
     };
-    void yell(bool win);//ÈıÖÖÇé¿ö£ºÓ®ÁË»¶ºô¼ÓÊ¿Æø£¬Ã»ËÀ»¶ºô¼õÊ¿Æø
+    void yell(bool win,int t,int min);//ä¸‰ç§æƒ…å†µï¼šèµ¢äº†æ¬¢å‘¼åŠ å£«æ°”ï¼Œæ²¡æ­»æ¬¢å‘¼å‡å£«æ°”
 };
 
 
@@ -83,6 +83,7 @@ public:
     int get_HP() const override {
         return HP;
     };
+    std::string get_weapon2();//è¾“å‡ºç¬¬äºŒä¸ªæ­¦å™¨ç±»å‹
     void use_arrow() override;
     void report_weapon() override;
     void print_info()const override {
@@ -93,7 +94,7 @@ public:
 class iceman : public Warrior {
 private:
 public:
-    int step;//¼ÇÂ¼Ñ©ÈËÇ°½ø²½Êı
+    int step;//è®°å½•é›ªäººå‰è¿›æ­¥æ•°
     static int HP;
     static int i_power;
     iceman(int id);
@@ -105,19 +106,19 @@ public:
     void print_info()const override {
         std::cout << "It has a " << this->my_weapon->kind << std::endl;
     };
-    void decrease_life();//¸ù¾İÇ°½ø²½Êı£¬¶ÔÑ©ÈË×´Ì¬¸üĞÂ
+    void decrease_life();//æ ¹æ®å‰è¿›æ­¥æ•°ï¼Œå¯¹é›ªäººçŠ¶æ€æ›´æ–°
 };
 
 class lion : public Warrior {
 private:
     int loyality;
 public:
-    bool to_run = false;//Ò»µ©Îªtrue£¬Ôò´¥·¢ÌÓÅÜ
-    double K;//ÖÒ³Ï¶ÈÏÂ½µµÄÖµ
+    bool to_run = false;//ä¸€æ—¦ä¸ºtrueï¼Œåˆ™è§¦å‘é€ƒè·‘
+    static double K;//å¿ è¯šåº¦ä¸‹é™çš„å€¼
     static int HP;
-    static int l_power;//ÕâÒ»ÖÖÀàµÄ¹¥»÷Á¦
+    static int l_power;//è¿™ä¸€ç§ç±»çš„æ”»å‡»åŠ›
 
-    double life_to_transfer;//Õ½°Üºó±£´æµÄÉúÃü
+    double life_to_transfer;//æˆ˜è´¥åä¿å­˜çš„ç”Ÿå‘½
 
     lion(int id);
     void set_loyality(int i);
@@ -130,7 +131,7 @@ public:
     void decrease_loyality();
 };
 
-class wolf : public Warrior {//ÀÇµÄÌØÊâĞÔÔÚÓÚ¼ñÆğ¶àÖÖÎäÆ÷¡£ËùÒÔÌá¹©Èı¸ö¡°×°±¸À¸¡±
+class wolf : public Warrior {//ç‹¼çš„ç‰¹æ®Šæ€§åœ¨äºæ¡èµ·å¤šç§æ­¦å™¨ã€‚æ‰€ä»¥æä¾›ä¸‰ä¸ªâ€œè£…å¤‡æ â€
            
 public:
     bool have_sword=false;
@@ -149,9 +150,11 @@ public:
     void print_info()const override {
 
     };
+    double start_war() override;
+    double fight_back() override;
     void use_arrow() override;
     void report_weapon() override;
-    void pick_weapon(weapon* w);//¼ñÆğÎäÆ÷
+    void pick_weapon(weapon* w);//æ¡èµ·æ­¦å™¨
 };
 
 

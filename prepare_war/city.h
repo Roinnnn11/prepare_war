@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef CITY_H
 #define CITY_H
 #include<iostream>
@@ -12,47 +12,55 @@ private:
 	int ID;
 	bool is_flag;
 	std::string flag;
-	bool have_bomb;//ÅĞ¶ÏÎäÊ¿ÊÇ·ñÓĞbomb
-	
-	bool who_to_start;//ÎªtrueÔòºì·½¿ªÊ¼
+	bool red_have_bomb;//åˆ¤æ–­æ­¦å£«æ˜¯å¦æœ‰bomb
+	bool blue_have_bomb;//åˆ¤æ–­æ­¦å£«æ˜¯å¦æœ‰bomb
 
-	bool red_win;//ÅĞ¶Ïºì·½ÊÇ·ñÊ¤Àû
-	bool blue_win;//ÅĞ¶ÏÀ¶·½ÊÇ·ñÊ¤Àû
+	bool who_to_start;//ä¸ºtrueåˆ™çº¢æ–¹å¼€å§‹
+
+	bool red_win;//åˆ¤æ–­çº¢æ–¹æ˜¯å¦èƒœåˆ©
+	bool blue_win;//åˆ¤æ–­è“æ–¹æ˜¯å¦èƒœåˆ©
 public:
 	city(int i);
+	bool have_war = false;//å‘ç”Ÿæˆ˜äº‰åˆ™ä¸ºtrue
 	Warrior* red_warrior;
 	Warrior* blue_warrior;
-	bool have_arrow;//ÅĞ¶ÏÊÇ·ñÓĞarrow
+	bool red_have_arrow;//åˆ¤æ–­æ­¦å£«æ˜¯å¦æœ‰arrow
+	bool blue_have_arrow;//åˆ¤æ–­æ­¦å£«æ˜¯å¦æœ‰arrow
 	void create_HP();
-	void enter_city(Warrior* w);//ÎäÊ¿½øÈë³ÇÊĞ£¬¼ÇÂ¼ÆäĞÅÏ¢
-	void to_start_war();//Õ½ÕùµÄÕû¸ö¹ı³Ì
-	bool predict_bomb();//³ÖÓĞÕ¨µ¯µÄ½øĞĞÔ¤ÅĞ
-	void use_bomb(int t,int min);//Ê¹ÓÃÕ¨µ¯£¬Ë«·½ËÀÍö
-	void use_arrow();//Ê¹ÓÃ¼ı
-	void who_start();//ÅĞ¶Ïºì·½½ø¹¥/À¶·½½ø¹¥,trueÎªºì
-	bool war();//Õ½Õù,ÎªfalseËµÃ÷Æ½¾Ö
+	void enter_city(Warrior* w);//æ­¦å£«è¿›å…¥åŸå¸‚ï¼Œè®°å½•å…¶ä¿¡æ¯
+	void to_start_war(int t,int min);//æˆ˜äº‰çš„æ•´ä¸ªè¿‡ç¨‹
+	int predict_bomb();//æŒæœ‰ç‚¸å¼¹çš„è¿›è¡Œé¢„åˆ¤
+	void use_bomb(int t,int min,int choice);//ä½¿ç”¨ç‚¸å¼¹ï¼ŒåŒæ–¹æ­»äº¡
+	void use_arrow();//ä½¿ç”¨ç®­
+	void who_start();//åˆ¤æ–­çº¢æ–¹è¿›æ”»/è“æ–¹è¿›æ”»,trueä¸ºçº¢
+	bool war(int t,int min);//æˆ˜äº‰,ä¸ºfalseè¯´æ˜å¹³å±€
 
-	//Õ½ÕùºóµÄÅĞ¶¨
-	void judge_yell();//ÅĞ¶ÏÊÇ·ñÓĞdragonÒÔ¼°ÊÇ·ñ·¢Éúyell
-	void judge_transfer();//¶ÔÊÇ·ñ´æÔÚlionÒÔ¼°·¢Éú×ªÒÆÉúÃüÖµ
-	void judge_pick();//¶ÔwolfÊÇ·ñ¼ñÆğÎäÆ÷
-	void judge_loyality();//¶ÔlionÖÒ³Ï¶ÈÏÂ½µ
-	void to_flag();//ÅĞ¶ÏÊÇ·ñ²åÆì
-	int took_HP();//Ê¤ÀûÒ»·½/Ö»ÓĞÒ»·½´æÔÚ »ñµÃµÄÉúÃüÔª
+	//æˆ˜äº‰åçš„åˆ¤å®š
+	void judge_yell(int t,int min);//åˆ¤æ–­æ˜¯å¦æœ‰dragonä»¥åŠæ˜¯å¦å‘ç”Ÿyell
+	void judge_transfer();//å¯¹æ˜¯å¦å­˜åœ¨lionä»¥åŠå‘ç”Ÿè½¬ç§»ç”Ÿå‘½å€¼
+	void judge_pick();//å¯¹wolfæ˜¯å¦æ¡èµ·æ­¦å™¨
+	void judge_loyality();//å¯¹lionå¿ è¯šåº¦ä¸‹é™
+	void to_flag(int t,int min);//åˆ¤æ–­æ˜¯å¦æ’æ——
+	int took_HP();//èƒœåˆ©ä¸€æ–¹/åªæœ‰ä¸€æ–¹å­˜åœ¨ è·å¾—çš„ç”Ÿå‘½å…ƒ
+
+	void warrior_leave();//æ­¦å£«ç¦»å¼€åŸå¸‚)
 };
 
 
 class cities {
-	
-public:
 	std::vector<city*> city_list;
-	int R;//¹­¼ı¹¥»÷Á¦
-	int N;//³ÇÊĞ¸öÊı
-	cities();
-	void cities_create_hp();//Ã¿¸ö³ÇÊĞĞÎ³ÉĞÂhp
-	void warrior_enter_city(HeadQuarter *red, HeadQuarter *blue);//ÎäÊ¿½øÈë³ÇÊĞ
-	void use_arrow();//ÈÃÓĞarrowµÄ³ÇÊĞ¶ÔÏÂÒ»¸öÊ¹ÓÃarrow
-	void OneWarrior_took_hp(HeadQuarter *red, HeadQuarter *blue);//Ö»ÓĞÒ»¸öÎäÊ¿µÄ³ÇÊĞµÄÉúÃüÔªÊ§È¥
-	void AfterWar_took_hp(HeadQuarter *red, HeadQuarter *blue);//Õ½Õù½áÊøºóµÄÉúÃüÔªÊ§È¥
+public:
+	
+	int R;//å¼“ç®­æ”»å‡»åŠ›
+	int N;//åŸå¸‚ä¸ªæ•°
+	cities(int n);
+	void cities_create_hp();//æ¯ä¸ªåŸå¸‚å½¢æˆæ–°hp
+	void warrior_enter_city(HeadQuarter *red, HeadQuarter *blue);//æ­¦å£«è¿›å…¥åŸå¸‚
+	void use_arrow();//è®©æœ‰arrowçš„åŸå¸‚å¯¹ä¸‹ä¸€ä¸ªä½¿ç”¨arrow
+	void use_bomb(int t, int min);//æ¨æµ‹æ˜¯å¦ä½¿ç”¨å¹¶ä½¿ç”¨bomb
+	void OneWarrior_took_hp(HeadQuarter *red, HeadQuarter *blue,int t,int min);//åªæœ‰ä¸€ä¸ªæ­¦å£«çš„åŸå¸‚çš„ç”Ÿå‘½å…ƒå¤±å»
+	void all_war(int t,int min);//æ‰€æœ‰åŸå¸‚è¿›è¡Œæˆ˜äº‰
+	void AfterWar_took_hp(HeadQuarter *red, HeadQuarter *blue,int t,int min);//æˆ˜äº‰ç»“æŸåçš„ç”Ÿå‘½å…ƒå¤±å»
+	void warrior_leave_city();//æ­¦å£«ç¦»å¼€åŸå¸‚
 };
 #endif // !CITY_H

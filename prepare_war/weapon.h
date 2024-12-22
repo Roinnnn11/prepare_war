@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #ifndef WEAPON_H
 #define WEAPON_H
 #include<iostream>
@@ -9,7 +9,7 @@ public:
     std::string kind;
     void operator=(const weapon& w);
     virtual void print_info()=0;
-    virtual bool lost_weapon() {//Èç¹ûÎªtrue£¬ÔòÊÓÎªÎäÊ¿²»ÔÙÓµÓĞÎäÆ÷
+    virtual bool lost_weapon() {//å¦‚æœä¸ºtrueï¼Œåˆ™è§†ä¸ºæ­¦å£«ä¸å†æ‹¥æœ‰æ­¦å™¨
         return true;
     };
     virtual ~weapon() {
@@ -25,7 +25,7 @@ public:
         kind.assign("sword");
     }
     ~sword() { }
-    bool lost_weapon() override{//ÔÚÃ¿´ÎÊ¹ÓÃÎäÆ÷Ö®ºó£¬µ÷ÓÃÕâ¸öº¯ÊıÅĞ¶ÏÎäÆ÷ÊÇ·ñÈÔÈ»´æÔÚ
+    bool lost_weapon() override{//åœ¨æ¯æ¬¡ä½¿ç”¨æ­¦å™¨ä¹‹åï¼Œè°ƒç”¨è¿™ä¸ªå‡½æ•°åˆ¤æ–­æ­¦å™¨æ˜¯å¦ä»ç„¶å­˜åœ¨
         power = int(power * 0.8);
         if (power <= 0) {
             return true;
@@ -51,16 +51,16 @@ public:
 class arrow : public weapon {
 private:
 public:
-    int used_cnt;//Ê¹ÓÃ´ÎÊı
+    int used_cnt;//ä½¿ç”¨æ¬¡æ•°
     arrow() {
         power = 5;
         used_cnt = 0;
         kind.assign("arrow");
     }
 
-    bool lost_weapon()override {//ÔÚÃ¿´ÎÊ¹ÓÃÎäÆ÷Ö®ºó£¬µ÷ÓÃÕâ¸öº¯ÊıÅĞ¶ÏÎäÆ÷ÊÇ·ñÈÔÈ»´æÔÚ
+    bool lost_weapon()override {//åœ¨æ¯æ¬¡ä½¿ç”¨æ­¦å™¨ä¹‹åï¼Œè°ƒç”¨è¿™ä¸ªå‡½æ•°åˆ¤æ–­æ­¦å™¨æ˜¯å¦ä»ç„¶å­˜åœ¨
         used_cnt++;
-        std::cout << "[DEBUG]ÎÒÓĞ±»µ÷ÓÃ" << std::endl;
+        std::cout << "[DEBUG]æˆ‘æœ‰è¢«è°ƒç”¨" << std::endl;
         if (used_cnt == 3) {
             return true;
         }
