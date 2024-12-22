@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="prepare_war.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="class_for_MoShou.cpp">
+    <ClCompile Include="class_headquarter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="class_weapon.cpp">
@@ -30,9 +30,12 @@
     <ClCompile Include="class_city.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Round_time.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MoShou.h">
+    <ClInclude Include="headquarter.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="warrior.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="city.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OneRound.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

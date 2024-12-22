@@ -128,14 +128,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="class_city.cpp" />
-    <ClCompile Include="class_for_MoShou.cpp" />
+    <ClCompile Include="class_headquarter.cpp" />
     <ClCompile Include="class_warrior.cpp" />
     <ClCompile Include="class_weapon.cpp" />
-    <ClCompile Include="prepare_war.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Round_time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="city.h" />
-    <ClInclude Include="MoShou.h" />
+    <ClInclude Include="headquarter.h" />
+    <ClInclude Include="OneRound.h" />
     <ClInclude Include="warrior.h" />
     <ClInclude Include="weapon.h" />
   </ItemGroup>

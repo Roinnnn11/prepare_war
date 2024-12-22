@@ -1,6 +1,6 @@
-#include<iostream>
+ï»¿#include<iostream>
 #include<vector>
-#include"MoShou.h"
+#include"headquarter.h"
 
 HeadQuarter::HeadQuarter(int m, std::string new_name) {
     HP_sum = m;
@@ -11,6 +11,11 @@ HeadQuarter:: ~HeadQuarter() {
     HeadQuarter::list_of_warriors.clear();
 };
 
+void HeadQuarter::add_HP(int hp) {
+	HP_sum += hp;
+	return;
+};
+  
 void HeadQuarter::show_kind_of_warrior(int order) {
     if (order == 0)    std::cout << "dragon";
     if (order == 1)    std::cout << "ninja";
@@ -33,7 +38,7 @@ void HeadQuarter::set_order_for_HeadQuarter(int n) {
         make_warrior_order[4] = 4;
         return;
     }
-    std::cout << "ÒÀ´ÎÊäÈëÎäÊ¿ÀàĞÍ" << std::endl;
+    std::cout << "ä¾æ¬¡è¾“å…¥æ­¦å£«ç±»å‹" << std::endl;
     for (int i = 0; i < 5; i++) {
         std::string s;
         std::cin >> s;
@@ -57,17 +62,15 @@ void HeadQuarter::set_order_for_HeadQuarter(int n) {
             make_warrior_order[i] = 4;
             continue;
         }
-        std::cout << "ÉÏÒ»¸öÊäÈë´íÎó£¬ÇëÖØÊÔ" << std::endl;
+        std::cout << "ä¸Šä¸€ä¸ªè¾“å…¥é”™è¯¯ï¼Œè¯·é‡è¯•" << std::endl;
         i--;
     }
 };
 
 int HeadQuarter::follow_order_to_create(int order) {
-    int cnt_fail_to_create = 0;
-    while (cnt_fail_to_create < 4) {
         int kind_of_warrior = make_warrior_order[order];
         Warrior* A = nullptr;
-        //²»·ÁÉèË³ĞòÎªdragon¡¢ninja¡¢iceman¡¢lion¡¢wolf
+        //ä¸å¦¨è®¾é¡ºåºä¸ºdragonã€ninjaã€icemanã€lionã€wolf
         switch (kind_of_warrior)
         {
         case 0:
@@ -82,8 +85,11 @@ int HeadQuarter::follow_order_to_create(int order) {
                 A->belong_headquater = this->name;
                 A->set_kind("dragon");
                 HP_sum -= A->get_HP();
+                //è®¾ç½®åˆå§‹ä½ç½®å’Œç›®çš„åœ°
+                A->destination = des;
+                A->In_city = base;
                 dragon* d = dynamic_cast<dragon*>(A);
-                    d->set_morale(HP_sum);  // ½öÔÚ new_warrior È·ÊµÊÇ dragon Ê±µ÷ÓÃ
+                    d->set_morale(HP_sum);  // ä»…åœ¨ new_warrior ç¡®å®æ˜¯ dragon æ—¶è°ƒç”¨
                     //std::cout << "[DEBUG]MORALE" << d->get_morale() << std::endl;
                 list_of_warriors.push_back(A);
                 //delete[]A;
@@ -101,6 +107,9 @@ int HeadQuarter::follow_order_to_create(int order) {
             else {
                 A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
+                //è®¾ç½®åˆå§‹ä½ç½®å’Œç›®çš„åœ°
+                A->destination = des;
+                A->In_city = base;
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
                 return 1;
@@ -116,6 +125,9 @@ int HeadQuarter::follow_order_to_create(int order) {
             else {
                 A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
+                //è®¾ç½®åˆå§‹ä½ç½®å’Œç›®çš„åœ°
+                A->destination = des;
+                A->In_city = base;
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
                 return 2;
@@ -134,6 +146,9 @@ int HeadQuarter::follow_order_to_create(int order) {
                 HP_sum -= A->get_HP();
                 lion* l = dynamic_cast<lion*>(A);
                 l->set_loyality(HP_sum);
+                //è®¾ç½®åˆå§‹ä½ç½®å’Œç›®çš„åœ°
+                A->destination = des;
+                A->In_city = base;
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
                 return 3;
@@ -149,29 +164,35 @@ int HeadQuarter::follow_order_to_create(int order) {
             else {
                 A->belong_headquater = this->name;
                 HP_sum -= A->get_HP();
+                A->destination = des;
+                A->In_city = base;
                 list_of_warriors.push_back(A);
                 cnt_of_different_warriors[kind_of_warrior]++;
                 return 4;
             }
             break;
         default:
-            std::cout << "·¢Éú´íÎó" << std::endl;
+            std::cout << "å‘ç”Ÿé”™è¯¯" << std::endl;
             return -1;
             break;
         }
-        order++; cnt_fail_to_create++;
-        order = order % 5;
-    }
-
-    std::cout << name << " headquarter stop making warriors" << std::endl;
+    std::cout <<"[DEBUG]" << name << " headquarter fail making warriors" << std::endl;
     return -1;
 };
 
 void HeadQuarter::create_warrior(int t) {
-    int order = t % 5;
+    int order;
     std::cout <<"00"<<t << "   ";
+    if(is_stop_creating) {
+        order = stop_creating_at;
+	}
+    else {
+        order = stop_creating_at++;
+        order = order % 5;
+    }
     int res = follow_order_to_create(order);
     if (res != -1) {
+        is_stop_creating = false;
         Warrior* p = list_of_warriors.back();
         std::cout << name << " ";
         show_kind_of_warrior(res);
@@ -182,12 +203,11 @@ void HeadQuarter::create_warrior(int t) {
         
         std::cout << " in " << name << " headquarter" << std::endl;
         p->print_info();
-        p->start_war();
- 
     }
         
     else {
         is_stop_creating = true;
+        stop_creating_at = order;
         return;
     }
 };
@@ -202,4 +222,75 @@ int HeadQuarter::get_HPSUM() {
 
 Warrior* HeadQuarter::get_warrior() {
     return list_of_warriors.front();
+};
+
+std::vector<Warrior*> HeadQuarter::get_list_of_warriors() {
+	return list_of_warriors;
+};
+
+void HeadQuarter::lion_run(int t,int min) {//tä»£è¡¨æ—¶é—´
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->get_kind() == "lion") {
+            lion* l = dynamic_cast<lion*>(list_of_warriors[i]);
+            if (l->to_run) {
+                std::cout << t << ":"<<min <<" ";
+                l->print_name();
+                std::cout<<" ran away"<<std::endl;
+                list_of_warriors.erase(list_of_warriors.begin() + i);
+            }
+        }
+    }
+};
+
+void HeadQuarter::march(int t,int min) {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->arrive_destination == false) {
+            std::cout<<t<<":"<<min<<" ";
+            if (list_of_warriors[i]->arrive_destination) {
+                continue;
+            }
+            bool res =list_of_warriors[i]->step_on();
+            if (res) {
+                TakeDown++;
+            }
+        }
+    }
+
 }
+
+
+
+void HeadQuarter::reward() {//ç”±è¿‘è‡³è¿œå¥–åŠ±ï¼Œåº”è¯¥å€’åºéå†vectoræ•°ç»„
+    for (int i = list_of_warriors.size()-1; i>=0; i--) {
+        if (list_of_warriors[i]->is_winner == true) {
+            if (HP_sum >= 8) {
+                list_of_warriors[i]->add_HP(8);
+                HP_sum -= 8;
+            }
+            else {//å‰©ä½™HPä¸è¶³å¥–åŠ±ï¼Œé€€å‡º
+                return;
+            }
+        }
+	}
+};
+
+void HeadQuarter::clear_dead() {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        if (list_of_warriors[i]->is_dead == true) {
+			list_of_warriors.erase(list_of_warriors.begin() + i);
+			i--;
+		}
+	}
+};   
+
+void HeadQuarter::report_hp() {
+	std::cout << HP_sum << " elements in " << name << " headquarter" << std::endl;
+	return;
+};
+
+void HeadQuarter::report_warrior(int t,int min) {
+    for (int i = 0; i < list_of_warriors.size(); i++) {
+        std::cout << t << ":" << min << " ";
+		list_of_warriors[i]->report_weapon(); 
+	}
+};
